@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="md_theme_primary">#4C6246</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#B4C8AA</color>
+    <color name="md_theme_onPrimaryContainer">#182316</color>
+    <color name="md_theme_secondary">#5C757A</color>
+    <color name="md_theme_onSecondary">#FFFFFF</color>
+    <color name="md_theme_secondaryContainer">#DEEBF1</color>
+    <color name="md_theme_onSecondaryContainer">#141E21</color>
+    <color name="md_theme_tertiary">#CB7A5C</color>
+    <color name="md_theme_onTertiary">#FFFFFF</color>
+    <color name="md_theme_tertiaryContainer">#FFDBC9</color>
+    <color name="md_theme_onTertiaryContainer">#331200</color>
+    <color name="md_theme_surface">#E9E2D8</color>
+    <color name="md_theme_onSurface">#1C1C18</color>
+    <color name="md_theme_surfaceContainer">#F0EAE2</color>
+    <color name="md_theme_error">#BA1A1A</color>
+    <color name="md_theme_onError">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
 </resources>
