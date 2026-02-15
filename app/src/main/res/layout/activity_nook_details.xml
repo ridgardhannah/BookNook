@@ -13,7 +13,8 @@
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Nook Details" />
+        app:title="Nook Details"
+        />
 
     <!--everything else in scrollview so everythingin here can be scrolled down-->
     <ScrollView
@@ -35,7 +36,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img_map_placeholder" />
+                android:src="@drawable/img_map_placeholder"
+                />
 
             <!--nook details in new linear layout under image. all info about nook-->
             <LinearLayout
@@ -50,7 +52,8 @@
                     android:layout_height="wrap_content"
                     android:text="Castle Street Nook"
                     android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    />
 
                 <!--distance. add in icon of map pin later?-->
                 <TextView
@@ -58,7 +61,8 @@
                     android:layout_height="wrap_content"
                     android:text="Book Nook Box • 0.4 km away"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    />
 
                 <!--mini horizontal linear layout for  buttons-->
                 <LinearLayout
@@ -76,7 +80,8 @@
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
                         android:text="Log a Book"
-                        app:icon="@drawable/ic_add" />
+                        app:icon="@drawable/ic_add"
+                        />
 
                     <!--get diretions button-->
                     <com.google.android.material.button.MaterialButton
@@ -85,10 +90,25 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Directions"
-                        app:icon="@drawable/ic_map" />
+                        app:icon="@drawable/ic_map"
+                        />
                 </LinearLayout>
 
                 <!--back in info linear layout for nook description title-->
+                <!--report button-->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReport"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="8dp"
+                    android:text="Report Issue"
+                    android:textColor="?attr/colorError"
+                    app:icon="@drawable/ic_report"
+                    app:iconTint="?attr/colorError"
+                    />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -103,6 +123,53 @@
                     android:layout_marginTop="8dp"
                     android:text="A beautiful repurposed birdhouse located just outside the park gates. Usually stocked with children's books and fantasy novels. Please ensure the latch is closed tightly to protect from rain!"
                     android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    />
+
+                <!--accessibility section-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Accessibility"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                <!--accessibility chips. fake examples for now-->
+                <com.google.android.material.chip.ChipGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.Material3.Chip.Assist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Wheelchair Accessible"
+                        app:chipIcon="@drawable/ic_account" />
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.Material3.Chip.Assist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Well Lit" /> <!--get icon for this later-->
+                </com.google.android.material.chip.ChipGroup>
+
+                <!--recent user activity section-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Recent Activity"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="?attr/colorSurfaceContainerLow"
+                    android:padding="16dp"
+                    android:text="Nothing has happened at this Nook yet. Be the first!"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
             </LinearLayout><!--end of info linear layout-->
