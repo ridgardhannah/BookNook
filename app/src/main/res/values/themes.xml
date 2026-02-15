@@ -32,6 +32,12 @@
         <item name="colorSurfaceContainer">@color/md_theme_surfaceContainer
         </item> <!-- slightly lighter cream-->
 
+        <!--variant colours-->
+        <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
+        <item name="colorOutlineVariant">@color/md_theme_outlineVariant</item>
+
+
+
         <!-- ERROR (material 3 red for errors. need for accessibility) -->
         <item name="colorError">@color/md_theme_error</item>
         <item name="colorOnError">@color/md_theme_onError</item>
@@ -40,7 +46,20 @@
         <item name="android:windowBackground">@color/md_theme_surface</item>
         <item name="android:statusBarColor">@color/md_theme_surface</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <!--tell nook pop up to have transparent background-->
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
+
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
 </resources>
 
 

@@ -20,4 +20,6 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
+    <color name="md_theme_onSurfaceVariant">#44483D</color>
+    <color name="md_theme_outlineVariant">#C4C8BB</color>
 </resources>
