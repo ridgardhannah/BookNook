@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+
+    <!--space for toolbar with back arrow-->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarBackBtn"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="Add New Nook" />
+
+    <!--everything from this point can be scrolled-->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/btnSubmitNook"
+        app:layout_constraintTop_toBottomOf="@id/toolbarBackBtn">
+
+        <!--everything between scrollbar and the submit button-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!--mini map selection area. do logic later. should be able to move map to line up with pin-->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                app:cardCornerRadius="16dp"
+                app:strokeWidth="0dp">
+
+                <!--map. placeholder pic for now-->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/img_map_placeholder" />
+
+                <!--map pin icon. maybe sort logic later to have pin colour vary according to nook type? problem for later-->
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_location_pin"
+                    app:tint="?attr/colorError" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!--mini instructions for moving map to pin point location of nook-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_gravity="center"
+                android:text="Move map to pin location"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall" />
+
+            <!--user input section-->
+            <!-- type in name-->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:hint="Nook Name">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="What would you like to name your Nook?" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!--drop down options for nook type. add more types and drop down list later-->
+            <!--type ideas: little free library(branding legal stuff tho?), converted phone box, community bookcase (options for pub/cafe/supermarket), council-owned library, outdoor reading spot, indoor reading spot-->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Nook Type">
+                <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:text="Little Free Library" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- big box to write a description in -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Description"
+                app:helperText="Tell us about the location and what books are there.">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minLines="4"
+                    android:gravity="top"
+                    android:text="A small green wooden box attached to the fence. Mostly contains crime thrillers and cookbooks!" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout><!--end on details linear layout-->
+    </ScrollView> <!--end of scrolly bit-->
+
+    <!-- submit button. find icon?-->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSubmitNook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:text="Submit Nook"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

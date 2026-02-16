@@ -30,6 +30,13 @@ public class MapFragment extends Fragment {
         pinCastle.setOnClickListener(v -> showNookPopup("Castle Street Nook", "Book Nook Box", "0.4 km"));
         pinPhone.setOnClickListener(v -> showNookPopup("The Old Phonebox", "Converted Nook", "1.1 km"));
 
+        //FAB for adding a nook. make it stand out
+        View fab = view.findViewById(R.id.fabAddNook);
+        fab.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AddNookActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 

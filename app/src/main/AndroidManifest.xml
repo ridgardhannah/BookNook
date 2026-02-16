@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookNookApp">
         <activity
+            android:name=".AddNookActivity"
+            android:exported="false" />
+        <activity
             android:name=".ReportIssueActivity"
             android:exported="false" />
         <activity

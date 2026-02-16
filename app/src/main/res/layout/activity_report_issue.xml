@@ -50,20 +50,40 @@
             android:layout_height="wrap_content"
             android:text="Other" />
 
+        <!--text for add photo-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Add a photo (optional)"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+        <!-- add photo button-->
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Upload Photo"
+            app:icon="@drawable/ic_add" />
+
+
         <!-- Text Input for Details -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:hint="Additional Details">
+            android:hint="Additional Details"
+            app:helperText="Please describe the issue in detail.">  <!-- little helper instruction under the box-->
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top"
                 android:inputType="textMultiLine"
-                android:minLines="4" />
+                android:minLines="4"
+                android:text="The door hinge is broken and won't stay closed....A squirrel might get in and eat the books!" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
