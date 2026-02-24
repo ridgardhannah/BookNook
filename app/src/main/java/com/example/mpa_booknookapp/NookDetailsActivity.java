@@ -48,20 +48,27 @@ public class NookDetailsActivity extends AppCompatActivity {
 
     //method to show popup for logging a book when log book button is presed
     private void showLogOptions() {
-        //set it up
-        View logView = getLayoutInflater().inflate(R.layout.layout_log_book_dialog, null);
-        //dialog box setup
+        // 1.create the dialog box view. calling it v
+        View v = getLayoutInflater().inflate(R.layout.layout_log_book_dialog, null);
+
         androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setView(logView)
+                .setView(v)
                 .create();
 
-        //for now buttons get rid of popup like the cancel button. sort logic later
-        //these buttons need the scanner logic....do later
-        logView.findViewById(R.id.btnPick).setOnClickListener(v -> dialog.dismiss());
-        logView.findViewById(R.id.btnDonate).setOnClickListener(v -> dialog.dismiss());
+        //find the buttons in the popup box and set the clickers
+        v.findViewById(R.id.btnPick).setOnClickListener(view -> {
+            dialog.dismiss();
+            Intent intent = new Intent(NookDetailsActivity.this, ScannerActivity.class);
+            startActivity(intent);
+        });
 
-        //cancel button to close dialog box
-        logView.findViewById(R.id.btnCancelLog).setOnClickListener(v -> dialog.dismiss());
+        v.findViewById(R.id.btnDonate).setOnClickListener(view -> {
+            dialog.dismiss();
+            Intent intent = new Intent(NookDetailsActivity.this, ScannerActivity.class);
+            startActivity(intent);
+        });
+
+        v.findViewById(R.id.btnCancelLog).setOnClickListener(view -> dialog.dismiss());
 
         dialog.show();
     }

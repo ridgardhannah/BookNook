@@ -14,7 +14,7 @@
     <color name="md_theme_onTertiaryContainer">#331200</color>
     <color name="md_theme_surface">#E9E2D8</color>
     <color name="md_theme_onSurface">#1C1C18</color>
-    <color name="md_theme_surfaceContainer">#F0EAE2</color>
+    <color name="md_theme_surfaceContainer">#DFD9D0</color>
     <color name="md_theme_error">#BA1A1A</color>
     <color name="md_theme_onError">#FFFFFF</color>
     <color name="white">#FFFFFF</color>

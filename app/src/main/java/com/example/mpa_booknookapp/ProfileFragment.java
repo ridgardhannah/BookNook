@@ -1,9 +1,11 @@
 package com.example.mpa_booknookapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -19,6 +21,15 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //inflate the layout
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+
+
+        ImageView settingsIcon = view.findViewById(R.id.ivSettings);
+        settingsIcon.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
+            startActivity(intent);
+        });
+
 
         //find the components for tab layout and the list veiw
         TabLayout tabLayout = view.findViewById(R.id.profileTabLayout);
