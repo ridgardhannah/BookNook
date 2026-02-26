@@ -6,15 +6,28 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!--space for back arrow to go back to popup-->
+    <!--toolbar with back arrow and now has logo (change ID 3)-->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Nook Details"
-        />
+        app:title="Nook Details">
+
+        <!--inside the toolbar-->
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="Book Nook Logo"
+            android:padding="4dp"
+            android:src="@drawable/logo_book_nook"
+            />
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
 
     <!--everything else in scrollview so everythingin here can be scrolled down-->
     <ScrollView
@@ -39,7 +52,7 @@
                 android:src="@drawable/img_map_placeholder"
                 />
 
-            <!--nook details in new linear layout under image. all info about nook-->
+            <!--nook details in new linear layout container under image. all info about nook-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,8 +65,7 @@
                     android:layout_height="wrap_content"
                     android:text="Castle Street Nook"
                     android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-                    android:textStyle="bold"
-                    />
+                    android:textStyle="bold" />
 
                 <!--distance. add in icon of map pin later?-->
                 <TextView
@@ -61,54 +73,55 @@
                     android:layout_height="wrap_content"
                     android:text="Book Nook Box • 0.4 km away"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    />
+                    android:textColor="?attr/colorOnSurfaceVariant" />
 
-                <!--mini horizontal linear layout for  buttons-->
+                <!--changed button layout(change ID 5)-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:orientation="horizontal">
 
-                    <!--log a book primary button-->
+                    <!--donate button (in primary)-->
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnLogBook"
+                        android:id="@+id/btnDonate"
                         style="@style/Widget.Material3.Button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:text="Log a Book"
+                        android:layout_weight="1"
+                        android:text="Donate"
                         app:icon="@drawable/ic_add"
+                        app:iconGravity="textStart"
                         />
 
-                    <!--get diretions button-->
+                    <!--find button (in secondary/tonal)-->
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFind"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="Directions"
-                        app:icon="@drawable/ic_map"
+                        android:text="Find Book"
+                        app:icon="@drawable/ic_search"
+                        app:iconGravity="textStart"
                         />
                 </LinearLayout>
 
-                <!--back in info linear layout for nook description title-->
-                <!--report button-->
+                <!-- then under this have directions button (outlined and full width) -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnReport"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/btnDirections"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_marginTop="8dp"
-                    android:text="Report Issue"
-                    android:textColor="?attr/colorError"
-                    app:icon="@drawable/ic_report"
-                    app:iconTint="?attr/colorError"
+                    android:text="Get Directions"
+                    app:icon="@drawable/ic_map"
+                    app:iconGravity="textStart"
                     />
 
+                <!--back in info linear layout for nook info-->
+                <!-- nook title-->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -116,15 +129,14 @@
                     android:text="About this Nook"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
-                <!--nook description contents-->
+                <!--nook description-->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="A beautiful repurposed birdhouse located just outside the park gates. Usually stocked with children's books and fantasy novels. Please ensure the latch is closed tightly to protect from rain!"
                     android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    />
+                    android:textColor="?attr/colorOnSurfaceVariant" />
 
                 <!--accessibility section-->
                 <TextView
@@ -171,6 +183,20 @@
                     android:text="Nothing has happened at this Nook yet. Be the first!"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <!--report issue button now down here. change ID 7. outlined. no longer red.-->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReport"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="48dp"
+                    android:text="Report Issue"
+                    android:textColor="?attr/colorPrimary"
+                    app:icon="@drawable/ic_report"
+                    app:iconTint="?attr/colorPrimary"
+                    app:iconGravity="textStart"
+                    app:strokeColor="?attr/colorPrimary" />
 
             </LinearLayout><!--end of info linear layout-->
         </LinearLayout><!--end of full linear layout-->

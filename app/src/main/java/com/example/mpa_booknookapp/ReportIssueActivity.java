@@ -2,10 +2,9 @@ package com.example.mpa_booknookapp;
 
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class ReportIssueActivity extends AppCompatActivity {
 
@@ -19,11 +18,17 @@ public class ReportIssueActivity extends AppCompatActivity {
 
         Button submitBtn = findViewById(R.id.btnSubmitReport);
         submitBtn.setOnClickListener(v -> {
-            //show report issue success snackbar
-            Snackbar.make(findViewById(android.R.id.content), "Issue reported successfully", Snackbar.LENGTH_LONG).show();
-
-            //wait 2 seconds and go back
-            new android.os.Handler().postDelayed(() -> finish(), 2000);
-        });
-    }
+            //changed for change Id 12
+            //success dialog box instead of snackbar for 2 seconds
+            new MaterialAlertDialogBuilder(ReportIssueActivity.this)
+                    .setTitle("Report Submitted")
+                    .setMessage("Thank you for flagging this issue. We will review your report shortly to keep the BookNook community safe.")
+                    .setCancelable(false) //now user has to click done to get rid of it. will be better than snackbar. no time constraint
+                    .setPositiveButton("Done", (dialog, which) -> {
+                        //only close when user clicks done
+                        finish();
+                    })
+                    .show();
+        }); //end of listener
+    }//end of oncreate
 }

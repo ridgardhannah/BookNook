@@ -89,10 +89,11 @@
         app:tabMode="fixed"
         app:tabSelectedTextColor="?attr/colorPrimary">
 
+        <!-- changed tab name for change id 13-->
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My Journey" />
+            android:text="My Activity" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"

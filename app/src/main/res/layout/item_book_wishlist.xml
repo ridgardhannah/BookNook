@@ -46,11 +46,7 @@
             android:textColor="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
 
-    <!-- delete to remove item from wishlist-->
-    <ImageView
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_delete"
-        app:tint="?attr/colorError" />
+    <!--removed delete icon for change id 14 -->
+
 
 </LinearLayout>

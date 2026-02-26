@@ -22,7 +22,7 @@ public class NookDetailsActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_nook_details);
 
-        //sort the padding for the top/bottom bars
+        //sort the padding for the top/bottom bars and edge-to-edge
         //waits for system to change size. listens for it
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -30,46 +30,38 @@ public class NookDetailsActivity extends AppCompatActivity {
             return insets;
         });
 
-        //logic to handle toolbar back button
+        //find the toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
+        //logic to handle toolbar back button
         //tells the little arrow at the top to just finish theis screen and go back to the map when tapped
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        //log book button logic. uses method under this one
-        Button logBookBtn = findViewById(R.id.btnLogBook);
-        logBookBtn.setOnClickListener(v -> showLogOptions());
+        //donate button opens the scanner
+        Button btnDonate = findViewById(R.id.btnDonate);
+        btnDonate.setOnClickListener(v -> {
+            Intent intent = new Intent(NookDetailsActivity.this, ScannerActivity.class);
+            // Note: Later we will add: intent.putExtra("MODE", "DONATE");
+            startActivity(intent);
+        });
 
+        // 2.find button opens the scanner
+        Button btnFind = findViewById(R.id.btnFind);
+        btnFind.setOnClickListener(v -> {
+            Intent intent = new Intent(NookDetailsActivity.this, ScannerActivity.class);
+            // Note: Later we will add: intent.putExtra("MODE", "FIND");
+            startActivity(intent);
+        });
+
+        //directions button vurrently just placeholder
+        Button btnDirections = findViewById(R.id.btnDirections);
+        btnDirections.setOnClickListener(v -> {
+            // Logic to open Google Maps will go here later
+        });
+
+        //report button opens report screen
         findViewById(R.id.btnReport).setOnClickListener(v -> {
             Intent intent = new Intent(NookDetailsActivity.this, ReportIssueActivity.class);
             startActivity(intent);
         });
-
     }//end of oncreate method
-
-    //method to show popup for logging a book when log book button is presed
-    private void showLogOptions() {
-        // 1.create the dialog box view. calling it v
-        View v = getLayoutInflater().inflate(R.layout.layout_log_book_dialog, null);
-
-        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-                .setView(v)
-                .create();
-
-        //find the buttons in the popup box and set the clickers
-        v.findViewById(R.id.btnPick).setOnClickListener(view -> {
-            dialog.dismiss();
-            Intent intent = new Intent(NookDetailsActivity.this, ScannerActivity.class);
-            startActivity(intent);
-        });
-
-        v.findViewById(R.id.btnDonate).setOnClickListener(view -> {
-            dialog.dismiss();
-            Intent intent = new Intent(NookDetailsActivity.this, ScannerActivity.class);
-            startActivity(intent);
-        });
-
-        v.findViewById(R.id.btnCancelLog).setOnClickListener(view -> dialog.dismiss());
-
-        dialog.show();
-    }
 }

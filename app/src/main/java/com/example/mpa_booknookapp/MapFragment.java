@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 public class MapFragment extends Fragment {
 
@@ -30,8 +31,8 @@ public class MapFragment extends Fragment {
         pinCastle.setOnClickListener(v -> showNookPopup("Castle Street Nook", "Book Nook Box", "0.4 km"));
         pinPhone.setOnClickListener(v -> showNookPopup("The Old Phonebox", "Converted Nook", "1.1 km"));
 
-        //FAB for adding a nook. make it stand out
-        View fab = view.findViewById(R.id.fabAddNook);
+        //FAB is now ExtendedFloatingActionButton
+        ExtendedFloatingActionButton fab = view.findViewById(R.id.fabAddNook);
         fab.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddNookActivity.class);
             startActivity(intent);
@@ -43,15 +44,17 @@ public class MapFragment extends Fragment {
     //update the method to take more details
     private void showNookPopup(String name, String type, String dist) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+
+        //will use this layout
         View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.layout_nook_popup, null);
 
-        //set the specific data
+        //set the specific data for the popup
+
         ((TextView) sheetView.findViewById(R.id.tvNookName)).setText(name);
         ((TextView) sheetView.findViewById(R.id.tvNookType)).setText(type);
         ((TextView) sheetView.findViewById(R.id.tvDistance)).setText(dist + " away");
 
-        //find view details button inside nook details popup.
-        //tell it to open the new screen
+        //tell it to open the full details screen when clicked
         sheetView.findViewById(R.id.btnViewDetails).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +63,7 @@ public class MapFragment extends Fragment {
 
                 //now launch the full details screen
                 //map fragment is inside mainactivity so cant use "this"
-                //have to use getActivity() because the fragment needs permission from the activity to start the new screen)
+                //have to use getActivity() because the fragment needs permission from the activity to start the new screen
                 Intent intent = new Intent(getActivity(), NookDetailsActivity.class);
                 startActivity(intent);
             }
