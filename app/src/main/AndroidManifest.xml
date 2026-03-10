@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookNookApp">
         <activity
+            android:name=".ConfirmBookActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EnterIsbnActivity"
+            android:exported="false" />
+        <activity
             android:name=".ScannerActivity"
             android:exported="false" />
         <activity

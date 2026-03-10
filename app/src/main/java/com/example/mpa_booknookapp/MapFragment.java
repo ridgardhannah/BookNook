@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
@@ -55,21 +56,14 @@ public class MapFragment extends Fragment {
         ((TextView) sheetView.findViewById(R.id.tvDistance)).setText(dist + " away");
 
         //tell it to open the full details screen when clicked
-        sheetView.findViewById(R.id.btnViewDetails).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //close the popup so its gone when we come back to this
-                bottomSheetDialog.dismiss();
-
-                //now launch the full details screen
-                //map fragment is inside mainactivity so cant use "this"
-                //have to use getActivity() because the fragment needs permission from the activity to start the new screen
-                Intent intent = new Intent(getActivity(), NookDetailsActivity.class);
-                startActivity(intent);
-            }
+        //click anywhere on the popup to get the full details
+        //change id 4
+        sheetView.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+            Intent intent = new Intent(getActivity(), NookDetailsActivity.class);
+            startActivity(intent);
         });
 
-        //show popup to user
         bottomSheetDialog.setContentView(sheetView);
         bottomSheetDialog.show();
     }

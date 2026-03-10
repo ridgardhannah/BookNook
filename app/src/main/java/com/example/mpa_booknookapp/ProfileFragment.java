@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +24,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
 
-
+        //logic for settings icon
         ImageView settingsIcon = view.findViewById(R.id.ivSettings);
         settingsIcon.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), SettingsActivity.class);
@@ -31,9 +32,10 @@ public class ProfileFragment extends Fragment {
         });
 
 
-        //find the components for tab layout and the list veiw
+        //find the components for tab layout, list view and scroll view
         TabLayout tabLayout = view.findViewById(R.id.profileTabLayout);
         ListView listView = view.findViewById(R.id.lvProfileContent);
+        ScrollView achievementsGrid = view.findViewById(R.id.achievementsContainer);
 
         //set up stat cards
         setupStats(view);
@@ -50,18 +52,23 @@ public class ProfileFragment extends Fragment {
         //default view will be journey list
         listView.setAdapter(new BookAdapter(requireContext(), journeyList));
 
-        //when a tab is clicked on
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 0) {
-                    listView.setAdapter(new BookAdapter(requireContext(), journeyList));
+                    //show "My Activity" list
+                    listView.setVisibility(View.VISIBLE);
+                    achievementsGrid.setVisibility(View.GONE);
                 } else {
-                    listView.setAdapter(new BookAdapter(requireContext(), achievementList));
+                    //show "Achievements" hex grid
+                    listView.setVisibility(View.GONE);
+                    achievementsGrid.setVisibility(View.VISIBLE);
                 }
             }
+
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
+
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });

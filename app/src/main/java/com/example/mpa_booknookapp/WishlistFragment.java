@@ -1,5 +1,6 @@
 package com.example.mpa_booknookapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -75,6 +76,11 @@ public class WishlistFragment extends Fragment {
         BookAdapter adapter = new BookAdapter(getContext(), bookList);
         listView.setAdapter(adapter);
 
+        //logic to open scanner when barcode icon pressed
+        view.findViewById(R.id.btnScanWishlist).setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ScannerActivity.class);
+            startActivity(intent);
+        });
         return view;
     }
 }

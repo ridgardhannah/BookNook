@@ -8,15 +8,15 @@
     android:background="?attr/colorSurface"
     tools:context=".SettingsActivity">
 
-    <!--top bar-->
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarSettings"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Settings"
-        />
+        app:title="Settings" />
+
 
     <ScrollView
         android:layout_width="match_parent"
@@ -39,8 +39,7 @@
                 android:text="Preferences"
                 android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                 android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -54,16 +53,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Notification Radius"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                    />
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="5 km"
                     android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    />
+                    android:textColor="?attr/colorOnSurfaceVariant" />
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/sliderRadius"
@@ -71,8 +68,7 @@
                     android:layout_height="wrap_content"
                     android:value="5.0"
                     android:valueFrom="1.0"
-                    android:valueTo="50.0"
-                    />
+                    android:valueTo="50.0" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -87,14 +83,12 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Wishlist Alerts"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                        />
+                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true"
-                        />
+                        android:checked="true" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -108,8 +102,7 @@
                 android:text="Appearance"
                 android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                 android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -129,8 +122,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
-                        android:text="System default"
-                        />
+                        android:text="System default" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -144,8 +136,7 @@
                 android:text="Accessibility"
                 android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
                 android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -159,16 +150,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Font Size"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                    />
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 
                 <com.google.android.material.slider.Slider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:value="50"
                     android:valueFrom="0"
-                    android:valueTo="100"
-                    />
+                    android:valueTo="100" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -183,13 +172,11 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="High-contrast Mode"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                        />
+                        android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        />
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -200,10 +187,8 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
-                android:background="?attr/colorOutlineVariant"
-                />
+                android:background="?attr/colorOutlineVariant" />
 
-            <!--button-->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 style="@style/Widget.Material3.Button.OutlinedButton"
@@ -215,9 +200,9 @@
                 android:textColor="?attr/colorError"
                 app:icon="@drawable/ic_lock_outline"
                 app:iconTint="?attr/colorError"
-                app:strokeColor="?attr/colorError"
-                />
+                app:strokeColor="?attr/colorError" />
 
         </LinearLayout>
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
