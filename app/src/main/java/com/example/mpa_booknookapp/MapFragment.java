@@ -22,6 +22,15 @@ public class MapFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
+        //logic for settings icon
+        ImageView settingsIcon = view.findViewById(R.id.ivSettings);
+        settingsIcon.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
+            startActivity(intent);
+        });
+
+
+
         //find all the pins we have for now
         View pinLib = view.findViewById(R.id.pin_library);
         View pinCastle = view.findViewById(R.id.pin_castle_street);
