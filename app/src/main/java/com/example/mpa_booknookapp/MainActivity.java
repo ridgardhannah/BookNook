@@ -25,8 +25,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-        startActivity(intent);
+
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 

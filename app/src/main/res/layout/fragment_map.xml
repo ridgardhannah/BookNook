@@ -1,37 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--just map placehoder pic for nw to check it owrks-->
-    <ImageView
-        android:id="@+id/ivMapBackground"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/img_map_placeholder"
-        android:scaleType="centerCrop"
-        app:layout_constraintTop_toTopOf="parent"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map_inside_the_fragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-
-    <!--floating search bar at top-->
-    <!--now white for better contrast (change ID 8)-->
+    <!-- search bar -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/search_bar_card"
+        android:id="@+id/search_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="28dp"
         app:cardElevation="6dp"
-        app:strokeWidth="0dp"
-        app:cardBackgroundColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,14 +35,14 @@
             android:orientation="horizontal"
             android:paddingHorizontal="16dp">
 
-            <!--search icon-->
+            <!-- search icon-->
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_search"
                 app:tint="?attr/colorOnSurfaceVariant" />
 
-            <!--text-->
+            <!--text/type area-->
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -64,87 +59,35 @@
                 android:src="@drawable/ic_filter"
                 app:tint="?attr/colorOnSurfaceVariant" />
 
-            <!--space before settings icon-->
             <Space
                 android:layout_width="16dp"
                 android:layout_height="wrap_content" />
 
-            <!--settings icon for change id 2-->
+            <!--settings-->
             <ImageView
-                android:id="@+id/btnSettings"
+                android:id="@+id/settingsButton"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_settings"
                 app:tint="?attr/colorOnSurfaceVariant" />
 
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView> <!--end of search bar-->
 
-    <!--map pins with white outline/background-->
-    <!--white background drawable to simulate outline (change ID9)-->
-    <!--pin 1 bright green library. probably change colour later?-->
-    <ImageView
-        android:id="@+id/pin_library"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:padding="4dp"
-        android:background="@drawable/bg_pin_outline"
-        android:src="@drawable/ic_location_pin"
-        app:tint="?attr/colorPrimary"
-        app:layout_constraintHorizontal_bias="0.3"
-        app:layout_constraintVertical_bias="0.4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <!--pin 2 book nook box. rust colour for now. change colour later-->
-    <ImageView
-        android:id="@+id/pin_castle_street"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:padding="4dp"
-        android:background="@drawable/bg_pin_outline"
-        android:src="@drawable/ic_location_pin"
-        app:tint="?attr/colorTertiary"
-        app:layout_constraintHorizontal_bias="0.6"
-        app:layout_constraintVertical_bias="0.55"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!--pin 3 phonebox. error red for now-->
-    <ImageView
-        android:id="@+id/pin_phonebox"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:padding="4dp"
-        android:background="@drawable/bg_pin_outline"
-        android:src="@drawable/ic_location_pin"
-        app:tint="?attr/colorError"
-        app:layout_constraintHorizontal_bias="0.8"
-        app:layout_constraintVertical_bias="0.3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!--now an extended FAB (change ID 10). can have text label now-->
-    <!--lets user add nook. keep at bottom so its top layer-->
+    <!--now an extended FAB instead of just a fab-->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAddNook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
+        android:backgroundTint="?attr/colorTertiary"
         android:contentDescription="Add New Nook"
         android:text="Add a Nook"
         android:textColor="?attr/colorOnTertiary"
         app:icon="@drawable/ic_add"
         app:iconTint="?attr/colorOnTertiary"
-        android:backgroundTint="?attr/colorTertiary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
