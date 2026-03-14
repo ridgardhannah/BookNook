@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_bottom_sheet"
     android:orientation="vertical"
     android:padding="24dp">
 
-    <!--handle-->
     <View
         android:layout_width="40dp"
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
-        android:background="?attr/colorOutlineVariant"
-        android:backgroundTint="?attr/colorOutlineVariant"
-        />
+        android:background="?attr/colorOutlineVariant" />
 
-    <!--horizontal block to keep image and text together. nice for structure-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,45 +22,32 @@
         android:gravity="center_vertical"
         android:layout_marginTop="16dp">
 
-        <!--nook image thumbnail -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivNookThumbnail"
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/miniMapContainer"
             android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:padding="1dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_map_placeholder"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
-            app:strokeColor="?attr/colorOutlineVariant"
-            app:strokeWidth="1dp"
-            />
+            android:layout_height="64dp" />
 
-        <!--vertical block for details-->
         <LinearLayout
-            android:layout_width="260dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="16dp"
             android:orientation="vertical">
 
-            <!--nook name -->
             <TextView
                 android:id="@+id/tvNookName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nook Name"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="?attr/colorOnSurface" />
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
 
-            <!-- nook type-->
             <TextView
                 android:id="@+id/tvNookType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Type"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
-            <!--nook distance -->
             <TextView
                 android:id="@+id/tvDistance"
                 android:layout_width="wrap_content"
@@ -71,7 +55,16 @@
                 android:text="0.5 km"
                 android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
                 android:textColor="?attr/colorPrimary" />
+
+            <TextView
+                android:id="@+id/tvAccessPrompt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Checking access..."
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall" />
         </LinearLayout>
+
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -79,7 +72,4 @@
             android:rotation="180"
             app:tint="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
-
-
-
 </LinearLayout>

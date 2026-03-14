@@ -37,6 +37,8 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.List;
+
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -131,6 +133,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
 
         //when user taps any map pin. could be an existing nook pin or a temp pin for creating new nook
+        //when user taps any map pin. could be an existing nook pin or a temp pin for creating new nook
         mMap.setOnMarkerClickListener(marker -> {
             //check if its a temp pin for adding new nook or existing nook first
             if (isPickingLocation && tempMarker != null && marker.getId().equals(tempMarker.getId())) {
@@ -148,7 +151,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             //if here, the user clicked a pre existing nook pin
             String nookName = marker.getTitle();
             if (nookName != null && !nookName.equals("Confirm Location?")) {
-                showNookPopup(nookName, marker.getSnippet(), "Nearby"); //show nook popup
+
+                // 1. THIS IS THE FIX: Read the sticky note (the Tag) from the marker
+                List<String> accessData = (List<String>) marker.getTag();
+
+                // 2. Pass 'accessData' instead of 'null'
+                showNookPopup(nookName, marker.getSnippet(), marker.getPosition(), accessData);
+
                 return true;
             }
 
@@ -208,7 +217,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void addNookPin(LatLng position, String title, String snippet, int colorInt) {
+    private void addNookPin(LatLng position, String title, String snippet, int colorInt, List<String> accessibility) {
         BitmapDescriptor customIcon = getCustomOutlinedPin(colorInt);
 
         MarkerOptions markerOptions = new MarkerOptions()
@@ -217,7 +226,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .snippet(snippet)
                 .icon(customIcon);
 
-        mMap.addMarker(markerOptions);
+        //create map pin and save it to a variable
+        com.google.android.gms.maps.model.Marker marker = mMap.addMarker(markerOptions);
+
+        //stick accessibility list
+        if (marker != null) {
+            marker.setTag(accessibility);
+        }
     }
 
     private void loadNooksFromFirebase() {
@@ -262,28 +277,84 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     // Add the pin to the map
                     if (lat != null && lng != null) {
                         LatLng pos = new LatLng(lat, lng);
-                        addNookPin(pos, name, desc, colorInt);
+
+                        // 1. THIS IS NEW: Grab the accessibility list from the doc
+                        List<String> accessibilityList = (List<String>) doc.get("accessibility");
+
+                        // 2. THIS WAS MISSING: Actually add the pin and pass the list in!
+                        addNookPin(pos, name, desc, colorInt, accessibilityList);
                     }
                 }
             }
         });
     }
 
-    private void showNookPopup(String name, String type, String dist) {
-        if (!isPickingLocation) { //in create nook mode.
+
+    private void showNookPopup(String name, String type, LatLng nookLatLng, List<String> accessibility) {
+
+        // 1. SAFETY CHECK FIRST! Only do this if we are NOT adding a new nook.
+        if (!isPickingLocation) {
+
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+
+            // 2. INFLATE THE VIEW FIRST! (Now the app knows where 'miniMapContainer' is)
             View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.layout_nook_popup, null);
 
+            // 3. SET BASIC INFO
             ((TextView) sheetView.findViewById(R.id.tvNookName)).setText(name);
             ((TextView) sheetView.findViewById(R.id.tvNookType)).setText(type);
-            ((TextView) sheetView.findViewById(R.id.tvDistance)).setText(dist);
 
+            // 4. DISTANCE CALCULATION
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                    if (location != null && sheetView != null) {
+                        float[] results = new float[1];
+                        android.location.Location.distanceBetween(location.getLatitude(), location.getLongitude(),
+                                nookLatLng.latitude, nookLatLng.longitude, results);
+
+                        float metres = results[0];
+                        String distance = (metres < 1000) ? (int) metres + "m away" : String.format("%.1f km away", metres / 1000f);
+
+                        TextView tvDistance = sheetView.findViewById(R.id.tvDistance);
+                        if (tvDistance != null) tvDistance.setText(distance);
+                    }
+                });
+            }
+
+            // 5. ACCESSIBILITY PROMPT
+            TextView tvPrompt = sheetView.findViewById(R.id.tvAccessPrompt);
+            if (accessibility != null && accessibility.contains("Open 24/7")) {
+                tvPrompt.setText("This nook is open 24/7!");
+                tvPrompt.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_theme_primary));
+            } else {
+                tvPrompt.setText("Hours unconfirmed by Nook creator - check details before visiting!");
+                tvPrompt.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_theme_tertiary));
+            }
+
+            // 6. THE NEW MAPVIEW LOGIC (No Fragment Manager needed!)
+            com.google.android.gms.maps.MapView miniMap = sheetView.findViewById(R.id.miniMapContainer);
+            if (miniMap != null) {
+                // We have to tell the MapView to "wake up" manually
+                miniMap.onCreate(null);
+                miniMap.onResume();
+
+                miniMap.getMapAsync(googleMap -> {
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nookLatLng, 15f));
+                    googleMap.addMarker(new MarkerOptions().position(nookLatLng));
+                    googleMap.getUiSettings().setAllGesturesEnabled(false);
+                    googleMap.getUiSettings().setMapToolbarEnabled(false);
+                });
+            }
+
+            // 7. CLICK TO OPEN FULL DETAILS
             sheetView.setOnClickListener(v -> {
                 bottomSheetDialog.dismiss();
                 Intent intent = new Intent(getActivity(), NookDetailsActivity.class);
+                intent.putExtra("nookName", name);
                 startActivity(intent);
             });
 
+            // 8. SHOW THE POPUP
             bottomSheetDialog.setContentView(sheetView);
             bottomSheetDialog.show();
         }
