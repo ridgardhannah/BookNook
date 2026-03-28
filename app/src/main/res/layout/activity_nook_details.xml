@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!--toolbar with back arrow and now has logo (change ID 3)-->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -15,7 +14,6 @@
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title="Nook Details">
 
-        <!--inside the toolbar-->
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -28,22 +26,18 @@
 
     </com.google.android.material.appbar.MaterialToolbar>
 
-
-    <!--everything else in scrollview so everythingin here can be scrolled down-->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-        <!--everything in linear layout to set up positioning-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="32dp">
 
-            <!--big nook image across whole width. Needs placeholder-->
             <ImageView
                 android:id="@+id/ivNookImage"
                 android:layout_width="match_parent"
@@ -52,7 +46,6 @@
                 android:src="@drawable/img_map_placeholder"
                 />
 
-            <!--nook details in new linear layout container under image. all info about nook-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -67,22 +60,20 @@
                     android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
                     android:textStyle="bold" />
 
-                <!--distance. add in icon of map pin later?-->
                 <TextView
+                    android:id="@+id/tvDetailTypeDistance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Book Nook Box • 0.4 km away"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
-                <!--changed button layout(change ID 5)-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:orientation="horizontal">
 
-                    <!--donate button (in primary)-->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnDonate"
                         style="@style/Widget.Material3.Button"
@@ -95,7 +86,6 @@
                         app:iconGravity="textStart"
                         />
 
-                    <!--find button (in secondary/tonal)-->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnFind"
                         style="@style/Widget.Material3.Button.TonalButton"
@@ -109,7 +99,6 @@
                         />
                 </LinearLayout>
 
-                <!-- then under this have directions button (outlined and full width) -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDirections"
                     style="@style/Widget.Material3.Button.OutlinedButton"
@@ -120,8 +109,6 @@
                     app:iconGravity="textStart"
                     />
 
-                <!--back in info linear layout for nook info-->
-                <!-- nook title-->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -129,16 +116,15 @@
                     android:text="About this Nook"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
-                <!--nook description-->
                 <TextView
+                    android:id="@+id/tvAboutDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="A beautiful repurposed birdhouse located just outside the park gates. Usually stocked with children's books and fantasy novels. Please ensure the latch is closed tightly to protect from rain!"
+                    android:text="Loading description..."
                     android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
-                <!--accessibility section-->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -146,27 +132,36 @@
                     android:text="Accessibility"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
-                <!--accessibility chips. fake examples for now-->
                 <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/cgAccessibility"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp">
-
-                    <com.google.android.material.chip.Chip
-                        style="@style/Widget.Material3.Chip.Assist"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Wheelchair Accessible"
-                        app:chipIcon="@drawable/ic_account" />
-
-                    <com.google.android.material.chip.Chip
-                        style="@style/Widget.Material3.Chip.Assist"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Well Lit" /> <!--get icon for this later-->
                 </com.google.android.material.chip.ChipGroup>
 
-                <!--recent user activity section-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Current Books inside"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvInventory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <TextView
+                    android:id="@+id/tvEmptyInventory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Loading books..."
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textStyle="italic" />
+
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -175,6 +170,7 @@
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
                 <TextView
+                    android:id="@+id/tvRecentActivity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -184,7 +180,6 @@
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
-                <!--report issue button now down here. change ID 7. outlined. no longer red.-->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnReport"
                     style="@style/Widget.Material3.Button.OutlinedButton"
@@ -198,8 +193,6 @@
                     app:iconGravity="textStart"
                     app:strokeColor="?attr/colorPrimary" />
 
-            </LinearLayout><!--end of info linear layout-->
-        </LinearLayout><!--end of full linear layout-->
-    </ScrollView>
+            </LinearLayout></LinearLayout></androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

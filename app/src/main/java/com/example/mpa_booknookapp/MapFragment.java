@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,6 +106,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }//end of oncreateview
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -113,7 +115,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setPadding(0, 214, 24, 0);
         loadNooksFromFirebase();
         getUserLocation();
-
 
         //when user taps somewhere on the map to put a pin there
         mMap.setOnMapClickListener(latLng -> {
@@ -133,7 +134,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
 
         //when user taps any map pin. could be an existing nook pin or a temp pin for creating new nook
-        //when user taps any map pin. could be an existing nook pin or a temp pin for creating new nook
         mMap.setOnMarkerClickListener(marker -> {
             //check if its a temp pin for adding new nook or existing nook first
             if (isPickingLocation && tempMarker != null && marker.getId().equals(tempMarker.getId())) {
@@ -150,20 +150,35 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             //if here, the user clicked a pre existing nook pin
             String nookName = marker.getTitle();
+
             if (nookName != null && !nookName.equals("Confirm Location?")) {
 
-                // 1. THIS IS THE FIX: Read the sticky note (the Tag) from the marker
-                List<String> accessData = (List<String>) marker.getTag();
+                //get the nook id from the marker
+                String id = "";
+                boolean isOpen247 = false; //default to closed just in case
 
-                // 2. Pass 'accessData' instead of 'null'
-                showNookPopup(nookName, marker.getSnippet(), marker.getPosition(), accessData);
+                Object rawTag = marker.getTag();
+
+                //tag has to be a pair
+                if (rawTag instanceof android.util.Pair) {
+                    android.util.Pair<String, Boolean> markerData = (android.util.Pair<String, Boolean>) rawTag;
+
+                    if (markerData.first != null) {
+                        id = markerData.first; //nooks unique id
+                    }
+                    if (markerData.second != null) {
+                        isOpen247 = markerData.second; //24/7 status
+                    }
+                }
+
+                //now show popup using the safely unpacked data
+                showNookPopup(id, nookName, marker.getSnippet(), marker.getPosition(), isOpen247);
 
                 return true;
             }
 
             return false;
         });
-
 
         //clicky for the tap to "Confirm Location" bubble. should go to add nook form
         mMap.setOnInfoWindowClickListener(marker -> {
@@ -175,7 +190,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 resetFabState(); //map cleanup for when forms done
             }
         });
-
 
     }//end of onMapReady
 
@@ -217,7 +231,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void addNookPin(LatLng position, String title, String snippet, int colorInt, List<String> accessibility) {
+    private void addNookPin(String id, LatLng position, String title, String snippet, int colorInt, boolean isOpen247) {
         BitmapDescriptor customIcon = getCustomOutlinedPin(colorInt);
 
         MarkerOptions markerOptions = new MarkerOptions()
@@ -226,12 +240,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .snippet(snippet)
                 .icon(customIcon);
 
-        //create map pin and save it to a variable
-        com.google.android.gms.maps.model.Marker marker = mMap.addMarker(markerOptions);
+        //create the map pin and save it to a variable called marker
+        Marker marker = mMap.addMarker(markerOptions);
 
-        //stick accessibility list
+        //stick 24/7 bool and nook id to pin
         if (marker != null) {
-            marker.setTag(accessibility);
+            marker.setTag(new Pair<>(id, isOpen247)); //true or false stuck to map pin. true means open
         }
     }
 
@@ -254,35 +268,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                 //look at each nook document in nooks collection in firebase and grab the info
                 for (QueryDocumentSnapshot doc : value) {
+                    String id = doc.getId(); //get the unique id from the db
                     String name = doc.getString("name");
-                    String desc = doc.getString("description");
+                    String nookType = doc.getString("nookType");
                     Double lat = doc.getDouble("lat");
                     Double lng = doc.getDouble("lng");
+                    Boolean isOpen247 = doc.getBoolean("isOpen247");
+                    if (isOpen247 == null) isOpen247 = false; //just in case
 
-                    // NEW WAY: Fetch the colour as a String (Text)
+                    //fetch the colour as a String (Text)
                     String hexColorStr = doc.getString("colour");
 
-                    // Set a default colour (Material Blue) just in case a Nook doesn't have one
-                    int colorInt = android.graphics.Color.parseColor("#1E88E5");
+                    //set a default colour just in case nook doesn't have one
+                    int colourInt = android.graphics.Color.parseColor("#1E88E5"); //blue
 
-                    // Safely try to convert the text ("#E53935") into a real Android Color number
+                    //try to convert the text of the colour ("#E53935") into a real android colour number
                     if (hexColorStr != null) {
                         try {
-                            colorInt = android.graphics.Color.parseColor(hexColorStr);
+                            colourInt = android.graphics.Color.parseColor(hexColorStr);
                         } catch (IllegalArgumentException e) {
                             Log.e("MapFragment", "Couldn't parse colour: " + hexColorStr);
                         }
                     }
 
-                    // Add the pin to the map
+                    //check thers coords so the position can be determined
                     if (lat != null && lng != null) {
                         LatLng pos = new LatLng(lat, lng);
 
-                        // 1. THIS IS NEW: Grab the accessibility list from the doc
+                        //pull in the accessibility list from the doc
                         List<String> accessibilityList = (List<String>) doc.get("accessibility");
 
-                        // 2. THIS WAS MISSING: Actually add the pin and pass the list in!
-                        addNookPin(pos, name, desc, colorInt, accessibilityList);
+                        //add the pin and pass the list in
+                        addNookPin(id, pos, name, nookType, colourInt, isOpen247);
                     }
                 }
             }
@@ -290,21 +307,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    private void showNookPopup(String name, String type, LatLng nookLatLng, List<String> accessibility) {
+    private void showNookPopup(String id, String name, String type, LatLng nookLatLng, boolean isOpen247) {
 
-        // 1. SAFETY CHECK FIRST! Only do this if we are NOT adding a new nook.
+        //safety check. only do this if NOT adding new nook
         if (!isPickingLocation) {
 
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
 
-            // 2. INFLATE THE VIEW FIRST! (Now the app knows where 'miniMapContainer' is)
+            //inflate the bottom sheet as we know where it is now
             View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.layout_nook_popup, null);
 
-            // 3. SET BASIC INFO
+            //basic info in popup
             ((TextView) sheetView.findViewById(R.id.tvNookName)).setText(name);
             ((TextView) sheetView.findViewById(R.id.tvNookType)).setText(type);
 
-            // 4. DISTANCE CALCULATION
+            //distance cal
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                     if (location != null && sheetView != null) {
@@ -321,23 +338,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 });
             }
 
-            // 5. ACCESSIBILITY PROMPT
+            //tell user if its likely to be open
             TextView tvPrompt = sheetView.findViewById(R.id.tvAccessPrompt);
-            if (accessibility != null && accessibility.contains("Open 24/7")) {
-                tvPrompt.setText("This nook is open 24/7!");
+            if (isOpen247) {
+                tvPrompt.setText("This Nook is open 24/7!");
                 tvPrompt.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_theme_primary));
             } else {
                 tvPrompt.setText("Hours unconfirmed by Nook creator - check details before visiting!");
                 tvPrompt.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_theme_tertiary));
             }
 
-            // 6. THE NEW MAPVIEW LOGIC (No Fragment Manager needed!)
+            //logic to see the teeny map
             com.google.android.gms.maps.MapView miniMap = sheetView.findViewById(R.id.miniMapContainer);
             if (miniMap != null) {
-                // We have to tell the MapView to "wake up" manually
+                //tell it to wakey shakey if it can find the mini map container space
                 miniMap.onCreate(null);
                 miniMap.onResume();
 
+                //user cant do anything with it like clicking/moving about
                 miniMap.getMapAsync(googleMap -> {
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nookLatLng, 15f));
                     googleMap.addMarker(new MarkerOptions().position(nookLatLng));
@@ -346,37 +364,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 });
             }
 
-            // 7. CLICK TO OPEN FULL DETAILS
+            //click on it to open the full nook details activity
             sheetView.setOnClickListener(v -> {
                 bottomSheetDialog.dismiss();
                 Intent intent = new Intent(getActivity(), NookDetailsActivity.class);
                 intent.putExtra("nookName", name);
+                intent.putExtra("NOOK_ID", id);
                 startActivity(intent);
             });
 
-            // 8. SHOW THE POPUP
+            //show
             bottomSheetDialog.setContentView(sheetView);
             bottomSheetDialog.show();
         }
     }
 
     private BitmapDescriptor getCustomOutlinedPin(int colorInt) {
-        // 1. Load the new Layered XML
+        //load in new layaered xml
         android.graphics.drawable.LayerDrawable layerDrawable =
                 (android.graphics.drawable.LayerDrawable) ContextCompat.getDrawable(requireContext(), R.drawable.bg_pin_outline);
 
         if (layerDrawable == null) return BitmapDescriptorFactory.defaultMarker();
 
-        // 2. Find ONLY the background layer and tint it
+        //get background layer and tint it
         Drawable background = layerDrawable.findDrawableByLayerId(R.id.pin_background);
         DrawableCompat.setTint(DrawableCompat.wrap(background).mutate(), colorInt);
 
-        // 3. Set the size and draw it into a Bitmap
+        //set size. draw it into a bitmap
         int targetWidth = 130;
         int targetHeight = 180;
         layerDrawable.setBounds(0, 0, targetWidth, targetHeight);
 
-        // 4. Create the Bitmap at the new larger size
+        //create bitmap at new larger size
         Bitmap bitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         layerDrawable.draw(canvas);

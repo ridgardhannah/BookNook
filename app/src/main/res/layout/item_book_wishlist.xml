@@ -7,19 +7,21 @@
     android:padding="16dp"
     android:gravity="center_vertical">
 
-    <!--placeholder for now for book cover. will eventually have actual covers - need api-->
+    <!--background for bookcover box. green-->
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="40dp"
-        android:layout_height="60dp"
-        app:cardCornerRadius="4dp"
+        android:layout_width="60dp"
+        android:layout_height="90dp"
+        app:cardCornerRadius="8dp"
         app:strokeWidth="0dp"
-        app:cardBackgroundColor="?attr/colorPrimaryContainer">
+        app:cardBackgroundColor="#D1E2CD">
+
         <ImageView
+            android:id="@+id/ivBookCover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_book"
-            android:padding="8dp"
-            app:tint="?attr/colorOnPrimaryContainer"/>
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true" />
+
     </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout

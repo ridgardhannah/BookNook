@@ -40,24 +40,23 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         //find buttons and views like edit text etc
-
         EditText etNameInput = findViewById(R.id.etName);
         Button backBtn = findViewById(R.id.btnBack);
         Button createAccountBtn = findViewById(R.id.btnCreateAccount);
         Button loginLinkBtn = findViewById(R.id.btnLoginLink);
 
-        //logic: create account. calls the method, which captures the text. takes user to main map
+        //create account. calls the method, which captures the text. takes user to main map
         createAccountBtn.setOnClickListener(v -> {
             createAccount();
         });
 
-        //logic: login link. closes this screen and returns to login screen
+        //login link. closes this screen and returns to login screen
         loginLinkBtn.setOnClickListener(v -> {
             //this will close this activity to go back to the login screen
             finish();
         });
 
-        //logic: back button. closes this screen.
+        //back button. closes this screen.
         backBtn.setOnClickListener(v -> {
             finish();
         });

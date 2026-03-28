@@ -7,7 +7,7 @@
     android:background="?attr/colorSurface"
     android:padding="24dp">
 
-    <!--card for book cover-->
+    <!--card for book cover to sit in-->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardBookCover"
         android:layout_width="160dp"
@@ -21,13 +21,15 @@
         app:layout_constraintVertical_chainStyle="packed">
 
         <ImageView
+            android:id="@+id/ivBookCover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_map_placeholder" /> <!-- Placeholder for cover -->
+            android:scaleType="centerCrop">
+
+        </ImageView>
     </com.google.android.material.card.MaterialCardView>
 
-    <!--bok details-->
+    <!--bok details and example for test-->
     <TextView
         android:id="@+id/tvBookTitle"
         android:layout_width="wrap_content"
@@ -72,23 +74,29 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnConfirm"
         style="@style/Widget.Material3.Button"
-        android:layout_width="match_parent"
+        android:minWidth="250dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="Confirm Log"
         app:icon="@drawable/ic_book"
         app:iconGravity="textStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnScanAgain" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnScanAgain"
         style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="match_parent"
+        android:minWidth="250dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:text="Scan Again"
         app:icon="@drawable/ic_add"
         app:iconGravity="textStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

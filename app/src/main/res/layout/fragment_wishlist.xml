@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!--title header-->
     <TextView
         android:id="@+id/tvWishlistTitle"
         android:layout_width="wrap_content"
@@ -19,18 +18,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-<!--settings icon added in for change id 2-->
-        <ImageView
-            android:id="@+id/btnSettings"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_margin="24dp"
-            android:src="@drawable/ic_settings"
-            app:tint="?attr/colorOnSurfaceVariant"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/btnSettings"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_margin="24dp"
+        android:src="@drawable/ic_settings"
+        app:tint="?attr/colorOnSurfaceVariant"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!--search bar-->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardWishlistSearch"
         android:layout_width="0dp"
@@ -50,25 +47,26 @@
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp">
 
-            <!--search icon-->
             <ImageView
+                android:id="@+id/btnTextSearchWishlist"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_search"
                 app:tint="?attr/colorOnSurfaceVariant"/>
 
-            <!--prompt text-->
             <EditText
+                android:id="@+id/etWishlistSearch"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@null"
                 android:hint="  Add a book..."
+                android:imeOptions="actionSearch"
+                android:inputType="textCapWords"
                 android:layout_marginStart="8dp"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"/>
 
-            <!--barcode scan icon-->
             <ImageView
                 android:id="@+id/btnScanWishlist"
                 android:layout_width="24dp"
@@ -78,8 +76,7 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!--list view for each book in wishlist-->
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lvWishlist"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -14,6 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,37 +26,28 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-
-
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
-         //default screen (map)
-        //if app is just opened for first time then load the map fragment
-        //check so we dont load new map just because user rotates phone. only happens when openeg app
-        if (savedInstanceState == null) {
-            //load map fragment
-            getSupportFragmentManager().beginTransaction()
-                    //find the fragment container in the layout and replace it with the map fragment
-                    .replace(R.id.fragment_container, new MapFragment())
-                    //do it now
-                    .commit();
-        }
-
-        //set up listener to switch to each fragment when user taps its icon
+        //tell nav bar what to do when a button is clicked
         bottomNav.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null; //start null, ready for one to be selected
-            int id = item.getItemId();  //get the id of the item that was tspped
+            Fragment selectedFragment = null;
+            int id = item.getItemId();
 
-            //work out which fragment to prep
             if (id == R.id.nav_map) {
-                selectedFragment = new MapFragment();     //prepare the fragment with the id that matches
+                selectedFragment = new MapFragment();
             } else if (id == R.id.nav_wishlist) {
                 selectedFragment = new WishlistFragment();
             } else if (id == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
+
+                if (getIntent().getBooleanExtra("OPEN_ACHIEVEMENTS", false)) {
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("SHOW_ACHIEVEMENTS", true);
+                    selectedFragment.setArguments(bundle); //stuffs the note into the fragment
+                    getIntent().removeExtra("OPEN_ACHIEVEMENTS"); //deletes original note
+                }
             }
 
-            //now have a selected fragment so replace the fragment container with it
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, selectedFragment)
@@ -63,5 +55,28 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+
+        //check which intent was used to get here
+        if (getIntent().getBooleanExtra("GO_TO_PROFILE", false)) {
+            //user came from achievement dialogueAchievement Dialog. nav bar selectts profile
+            bottomNav.setSelectedItemId(R.id.nav_profile);
+        } else if (savedInstanceState == null) {
+            //opened app normaly so force the navbar to select map
+            bottomNav.setSelectedItemId(R.id.nav_map);
+        }
     }
+
+    //runs if main activity is already open in the background and gets a new intent. use with achievement dialog
+    @Override
+    protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+
+        setIntent(intent); //updates the activities memory with new intent.
+
+        if (intent.getBooleanExtra("GO_TO_PROFILE", false)) {
+            com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+            bottomNav.setSelectedItemId(R.id.nav_profile);
+        }
+    }
+
 }

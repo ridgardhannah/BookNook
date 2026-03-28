@@ -29,7 +29,7 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!--mini map selection area. do logic later. should be able to move map to line up with pin-->
+            <!--mini map selection area. do logic later.-->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
@@ -53,6 +53,68 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!--user input section-->
+            <!--photo section title-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:text="Photos"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:paddingBottom="8dp">
+
+                <LinearLayout
+                    android:id="@+id/llPhotoGallery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cvAddPhoto"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_marginEnd="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardBackgroundColor="#F0F0F0"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#BDBDBD"
+                        app:strokeWidth="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:src="@drawable/ic_camera"
+                                app:tint="#757575" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Add photo"
+                                android:textColor="#757575"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+
             <!-- type in name-->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -102,6 +164,15 @@
                     android:gravity="top" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- 24/7 switch required-->
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchOpen247"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Is this Nook open 24/7?"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -133,18 +204,7 @@
                     android:layout_height="wrap_content"
                     android:text="Well Lit Area"
                     app:chipIcon="@drawable/ic_lightbulb" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipOpenAlways"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Open 24/7"
-                    app:chipIcon="@drawable/ic_clock" />
-
             </com.google.android.material.chip.ChipGroup>
-
-
 
         </LinearLayout><!--end on details linear layout-->
     </ScrollView> <!--end of scrolly bit-->

@@ -24,18 +24,18 @@ public class SettingsActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        // 1. Setup Toolbar (Standard M3 way to go back)
+        //setup toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbarSettings);
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        // 2. Setup Padding for Edge-to-Edge
+        //edge to edge padding setup stuffs
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // 3. Setup Logout Button to show the Dialog first
+        //setup logout button. show dialog first
         Button logoutButton = findViewById(R.id.btnLogout);
         logoutButton.setOnClickListener(v -> {
             showLogoutConfirmation();

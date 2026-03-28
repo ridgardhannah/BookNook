@@ -11,7 +11,7 @@
     tools:context=".LoginActivity">
 
 
-    <!-- logo-->
+    <!--logo-->
     <ImageView
         android:id="@+id/ivLogo"
         android:layout_width="100dp"
@@ -59,6 +59,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:hint="Email"
+        app:placeholderText="alex_reads@example.com"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvLoginTitle"
@@ -70,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
-            android:text="alex_reads@example.com" /> <!-- example email adr -->
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -101,7 +102,7 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- login button primary filled colour -->
+    <!--login button primary filled colour -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
         style="@style/Widget.Material3.Button"
@@ -118,7 +119,7 @@
         app:layout_constraintTop_toBottomOf="@id/tilPassword"
         />
 
-    <!-- forgot password text button -->
+    <!--forgot password text button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnForgotPassword"
         style="@style/Widget.Material3.Button.TextButton"
@@ -132,7 +133,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnLogin" />
 
-    <!-- sign up text button at bottom-->
+    <!--sign up text button at bottom-->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSignUp"
         style="@style/Widget.Material3.Button.TextButton"

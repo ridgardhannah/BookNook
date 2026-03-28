@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-        // Logic: Navigate to Forgot Password
+        //nav to forgot password screen
         forgotPasswordButton.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);

@@ -26,10 +26,29 @@ public class EnterIsbnActivity extends AppCompatActivity {
 
         ((MaterialToolbar) findViewById(R.id.toolbar)).setNavigationOnClickListener(v -> finish());
 
-        //pretend logic for now. click look up-> Confirmation Screen
+        //take the donate/find/wishlist mode and the nook id from previous screen
+        String scanMode = getIntent().getStringExtra("MODE");
+        String currentNookId = getIntent().getStringExtra("NOOK_ID");
+
+        //find isbn inputfield and search button
+        com.google.android.material.textfield.TextInputEditText etIsbn = findViewById(R.id.etIsbn);
+
         findViewById(R.id.btnLookUp).setOnClickListener(v -> {
-            Intent intent = new Intent(EnterIsbnActivity.this, ConfirmBookActivity.class);
-            startActivity(intent);
+            //get the number as a string
+            String enteredIsbn = etIsbn.getText().toString().trim();
+
+
+            //be sure user actully typed an isbn and make another intent to confirm the book
+            if (!enteredIsbn.isEmpty()) {
+                Intent intent = new Intent(EnterIsbnActivity.this, ConfirmBookActivity.class);
+                intent.putExtra("ISBN", enteredIsbn);
+                intent.putExtra("MODE", scanMode);
+                intent.putExtra("NOOK_ID", currentNookId);
+                startActivity(intent);
+                finish();
+            } else {
+                etIsbn.setError("Please enter an ISBN / barcode number.");
+            }
         });
     }
 }
