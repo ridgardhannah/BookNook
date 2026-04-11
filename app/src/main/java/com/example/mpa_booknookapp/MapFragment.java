@@ -3,11 +3,14 @@ package com.example.mpa_booknookapp;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -22,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
@@ -39,6 +43,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -50,17 +55,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FusedLocationProviderClient fusedLocationClient;
+    private Location lastKnownUserLocation = null;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 101;
     private Marker tempMarker;
     private boolean isPickingLocation = false; //track state for when adding new nook
     private ExtendedFloatingActionButton fab;
 
-    //fir the search filter
+    //for the search typing and filtering by type
     private String currentSearchQuery = ""; //starts empty
     private List<QueryDocumentSnapshot> allNooksList = new ArrayList<>();
+    private ArrayList<String> selectedNookTypes = new ArrayList<>();
+    private boolean isFilterActive = false; //start as false
 
     @Nullable
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //inflate layout for map fragment
@@ -85,7 +92,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             });
         }
 
-        //search for nooks logic
+        //search for nooks by name logic
         EditText etSearch = view.findViewById(R.id.etMapSearch);
         ImageView btnSearch = view.findViewById(R.id.btnMapSearch);
 
@@ -109,19 +116,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
                 return false;
             });
-
         }
 
+        ImageView filterButton = view.findViewById(R.id.btnMapFilter);
+        if (filterButton != null) { //if clicked
+            filterButton.setOnClickListener(v -> showFilterDialog());
+        }
 
         //FAB is now ExtendedFloatingActionButton from user testing 1
         fab = view.findViewById(R.id.fabAddNook);
+        View fabCancelAdd = view.findViewById(R.id.fabCancelAdd);
+
+        //if cancel is tapped stop adding nook process.
+        if (fabCancelAdd != null) {
+            fabCancelAdd.setOnClickListener(v -> resetFabState());
+        }
+
         if (fab != null) {
             fab.setOnClickListener(v -> { //when user taps the fab
                 if (!isPickingLocation) {
                     //if not already in pin placement mode enter it now. change flag to true
                     isPickingLocation = true;
-                    fab.setText("Tap the map to choose a location");
+                    fab.setText("Tap map to drop pin"); // Shortened slightly to fit nicely next to Cancel
                     fab.setIconResource(R.drawable.ic_location_pin);
+
+                    // NEW: Show the Cancel button!
+                    if (fabCancelAdd != null) fabCancelAdd.setVisibility(View.VISIBLE);
 
                 } else {
                     //then go to the form if loc is chosen
@@ -152,7 +172,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
         mMap.setPadding(0, 214, 24, 0);
         loadNooksFromFirebase();
-        getUserLocation();
+
+        //check user sharedpreferences to see if tutorial is done
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        SharedPreferences prefs = requireActivity().getSharedPreferences("BookNookPrefs", Context.MODE_PRIVATE);
+        boolean hasSeenTutorial = prefs.getBoolean("hasSeenTutorial_" + userId, false);
+
+        //if tutorial is already done, ask for location permission
+        if (hasSeenTutorial) {
+            getUserLocation();
+        }
 
         //when user taps somewhere on the map to put a pin there
         mMap.setOnMapClickListener(latLng -> {
@@ -185,7 +214,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 resetFabState(); //clean up map
                 return true; //click handled now. dont show the bubble
             }
-
             //if here, the user clicked a pre existing nook pin
             String nookName = marker.getTitle();
 
@@ -196,10 +224,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 boolean isOpen247 = false; //default to closed just in case
 
                 Object rawTag = marker.getTag();
-
                 //tag has to be a pair
-                if (rawTag instanceof android.util.Pair) {
-                    android.util.Pair<String, Boolean> markerData = (android.util.Pair<String, Boolean>) rawTag;
+
+                if (rawTag instanceof Pair) {
+                    Pair<String, Boolean> markerData = (Pair<String, Boolean>) rawTag;
 
                     if (markerData.first != null) {
                         id = markerData.first; //nooks unique id
@@ -208,13 +236,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         isOpen247 = markerData.second; //24/7 status
                     }
                 }
-
                 //now show popup using the safely unpacked data
                 showNookPopup(id, nookName, marker.getSnippet(), marker.getPosition(), isOpen247);
-
                 return true;
             }
-
             return false;
         });
 
@@ -228,7 +253,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 resetFabState(); //map cleanup for when forms done
             }
         });
-
     }//end of onMapReady
 
 
@@ -240,13 +264,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         if (tempMarker != null) tempMarker.remove();
         tempMarker = null;
+
+        //hide cancel button again
+        if (getView() != null) {
+            View btnCancel = getView().findViewById(R.id.fabCancelAdd);
+            if (btnCancel != null) btnCancel.setVisibility(View.GONE);
+        }
     }
 
-    private void getUserLocation() {
+    public void getUserLocation() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
                 if (location != null) {
+                    //save the location in our variable
+                    lastKnownUserLocation = location;
+
                     LatLng userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f));
                 }
@@ -309,6 +342,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     //method that draws and filters the pins
     private void refreshMapPins() {
+        //is map fragment currently showing on screen or have we lost connection to background resources? if either of these, skip this method
+        if (!isAdded() || getContext() == null) {
+            return; //map isnt on screen atm, so ignore the update and dont do anything
+        }
+
         if (mMap == null) return;
         mMap.clear(); //clear off all pins from map. nice clean slate
 
@@ -325,37 +363,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             //checking by nook name
             String name = nook.getString("name");
             if (name == null) name = "";
+            String nookType = nook.getString("nookType"); //get nooks type for filtering and for picking pin colour
 
-            //filter logic: if there is a search query, skip this Nook if it doesn't match the search
+
+            //text filter/search logic. if there is a search query, skip this Nook if it doesnt match the search
             if (!currentSearchQuery.isEmpty() && !name.toLowerCase().contains(currentSearchQuery.toLowerCase())) {
                 continue; //skips to the next nook in the loop
+            }
+
+            //if filter is on and this nooks type isnt on thelist of checked types, skip this nook
+            if (isFilterActive && nookType != null &&!selectedNookTypes.contains(nookType)) {
+                continue;
             }
 
             //if it meets the search. or if theres no search at all and we want them all, draw it in
             //get its details
             String id = nook.getId();
-            String nookType = nook.getString("nookType");
             Double lat = nook.getDouble("lat");
             Double lng = nook.getDouble("lng");
             Boolean isOpen247 = nook.getBoolean("isOpen247");
             if (isOpen247 == null) isOpen247 = false;
 
-            String hexColourStr = nook.getString("colour");
-            int colourInt = Color.parseColor("#1E88E5"); //default blue
-
-            if (hexColourStr != null) {
-                try {
-                    colourInt = Color.parseColor(hexColourStr);
-                } catch (IllegalArgumentException e) {
-                    Log.e("MapFragment", "Couldn't get colour: " + hexColourStr);
-                }
-            }
+            //sort pin colour out
+            //get hex string locally based on the type. parse it now
+            int colourInt = Color.parseColor(getColourForType(nookType));
 
             //make it if we have coords and put in right place on map
             if (lat != null && lng != null) {
                 LatLng pos = new LatLng(lat, lng);
                 addNookPin(id, pos, name, nookType, colourInt, isOpen247);
             }
+
         }
     }
 
@@ -375,20 +413,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             ((TextView) sheetView.findViewById(R.id.tvNookType)).setText(type);
 
             //distance cal
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-                    if (location != null && sheetView != null) {
-                        float[] results = new float[1];
-                        android.location.Location.distanceBetween(location.getLatitude(), location.getLongitude(),
-                                nookLatLng.latitude, nookLatLng.longitude, results);
+            if (lastKnownUserLocation != null && sheetView != null) {
+                float[] results = new float[1];
+                android.location.Location.distanceBetween(
+                        lastKnownUserLocation.getLatitude(), lastKnownUserLocation.getLongitude(),
+                        nookLatLng.latitude, nookLatLng.longitude, results);
 
-                        float metres = results[0];
-                        String distance = (metres < 1000) ? (int) metres + "m away" : String.format("%.1f km away", metres / 1000f);
+                float metres = results[0];
+                String distance = (metres < 1000) ? (int) metres + "m away" : String.format("%.1f km away", metres / 1000f);
 
-                        TextView tvDistance = sheetView.findViewById(R.id.tvDistance);
-                        if (tvDistance != null) tvDistance.setText(distance);
-                    }
-                });
+                TextView tvDistance = sheetView.findViewById(R.id.tvDistance);
+                if (tvDistance != null) {
+                    tvDistance.setText(distance);
+                    tvDistance.setVisibility(View.VISIBLE);
+                }
+            } else {
+                //if we don't have their location yet hide the distance text
+                TextView tvDistance = sheetView.findViewById(R.id.tvDistance);
+                if (tvDistance != null) tvDistance.setVisibility(View.GONE);
             }
 
             //tell user if its likely to be open
@@ -401,20 +443,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 tvPrompt.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_theme_tertiary));
             }
 
-            //logic to see the teeny map
-            com.google.android.gms.maps.MapView miniMap = sheetView.findViewById(R.id.miniMapContainer);
-            if (miniMap != null) {
-                //tell it to wakey shakey if it can find the mini map container space
-                miniMap.onCreate(null);
-                miniMap.onResume();
+            //teeny weeny thumbnail
+            android.widget.ImageView ivThumbnail = sheetView.findViewById(R.id.ivNookThumbnail);
+            if (ivThumbnail != null) {
+                //ask frebase for the nooks photos using nook id
+                FirebaseFirestore.getInstance().collection("nooks").document(id).get()
+                        .addOnSuccessListener(doc -> {
+                            List<String> photos = new ArrayList<>();
 
-                //user cant do anything with it like clicking/moving about
-                miniMap.getMapAsync(googleMap -> {
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(nookLatLng, 15f));
-                    googleMap.addMarker(new MarkerOptions().position(nookLatLng));
-                    googleMap.getUiSettings().setAllGesturesEnabled(false);
-                    googleMap.getUiSettings().setMapToolbarEnabled(false);
-                });
+                            //find any photos
+                            Object picPaths = doc.get("imageUrls");
+                            if (picPaths instanceof List) photos.addAll((List<String>) picPaths);
+
+                            Object oldPaths = doc.get("imageUrl");
+                            if (oldPaths instanceof List) photos.addAll((List<String>) oldPaths);
+                            else if (oldPaths instanceof String && !((String) oldPaths).isEmpty()) photos.add((String) oldPaths);
+
+                            //if any pics are found then set the first one
+                            if (!photos.isEmpty()) {
+                                //for permissions. placeholder ready just in case. dont delete it
+                                try {
+                                    ivThumbnail.setImageURI(android.net.Uri.parse(photos.get(0)));
+                                } catch (SecurityException e) {
+                                    android.util.Log.e("MapFragment", "Permission denied for photo: " + e.getMessage());
+                                    //show if photo blocked
+                                    ivThumbnail.setImageResource(R.drawable.img_map_placeholder);
+                                }
+                            } else {
+                                //none found. keep placeholder pic
+                                ivThumbnail.setImageResource(R.drawable.img_map_placeholder);
+                            }
+                        });
             }
 
             //click on it to open the full nook details activity
@@ -423,6 +482,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Intent intent = new Intent(getActivity(), NookDetailsActivity.class);
                 intent.putExtra("nookName", name);
                 intent.putExtra("NOOK_ID", id);
+                intent.putExtra("nookLat", nookLatLng.latitude);
+                intent.putExtra("nookLng", nookLatLng.longitude);
                 startActivity(intent);
             });
 
@@ -434,8 +495,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private BitmapDescriptor getCustomOutlinedPin(int colorInt) {
         //load in new layaered xml
-        android.graphics.drawable.LayerDrawable layerDrawable =
-                (android.graphics.drawable.LayerDrawable) ContextCompat.getDrawable(requireContext(), R.drawable.bg_pin_outline);
+        LayerDrawable layerDrawable = (LayerDrawable) ContextCompat.getDrawable(requireContext(), R.drawable.bg_pin_outline);
 
         if (layerDrawable == null) return BitmapDescriptorFactory.defaultMarker();
 
@@ -443,7 +503,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Drawable background = layerDrawable.findDrawableByLayerId(R.id.pin_background);
         DrawableCompat.setTint(DrawableCompat.wrap(background).mutate(), colorInt);
 
-        //set size. draw it into a bitmap
+        //set size
         int targetWidth = 130;
         int targetHeight = 180;
         layerDrawable.setBounds(0, 0, targetWidth, targetHeight);
@@ -455,4 +515,75 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
+
+
+    //method to scan all nooks in list, build checklist and show pop up.
+    private void showFilterDialog(){
+        //find all unique nook types from list of nooks
+        ArrayList<String> uniqueNookTypes = new ArrayList<>();
+        for (QueryDocumentSnapshot nook : allNooksList) {
+            String type = nook.getString("nookType");
+            if (type != null && !type.isEmpty() && !uniqueNookTypes.contains(type)) { //i.e there are types, its not empty and the type isnt already on the list
+                uniqueNookTypes.add(type); //add type to list of unique types
+            }
+        }
+
+        if (uniqueNookTypes.isEmpty()){ //none to show so no nooks available
+            Toast.makeText(getContext(), "No Nooks available to filter yet!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //turn uniquetypes into an array so dialog can read it
+        String[] typeArray = uniqueNookTypes.toArray(new String[0]);
+        boolean[] checkedItems = new boolean [typeArray.length];
+
+        //check items already selected before
+        for (int i = 0; i <typeArray.length; i++){
+            if (selectedNookTypes.contains(typeArray[i])){
+                checkedItems[i] = true;
+            }
+        }
+
+        //now build and show checklist popup
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Filter by Nook Type")
+                .setMultiChoiceItems(typeArray, checkedItems, (dialog, which, isChecked) -> {
+                    String type = typeArray[which];
+                    if (isChecked){
+                        if (!selectedNookTypes.contains(type)) selectedNookTypes.add(type);
+                    } else {
+                        selectedNookTypes.remove(type);
+                    }
+                })
+                .setPositiveButton("Apply", (dialog, which) -> {
+                    isFilterActive = !selectedNookTypes.isEmpty();
+                    refreshMapPins();//redraw map with new filters applied
+                })
+                .setNegativeButton("Clear All", (dialog, which) -> {
+                    selectedNookTypes.clear();
+                    isFilterActive = false;
+                    refreshMapPins(); //show everything again
+                })
+                .show(); //boom
+
+
+
+    }
+
+
+    //local pin color logic
+    private String getColourForType(String type) {
+        if (type == null) return "#1E88E5"; //default blue
+        switch (type) {
+            case "Converted Phone Box": return "#D32F2F"; //red
+            case "Community Bookcase (Cafe)": return "#FF9800"; //orange
+            case "Community Bookcase (Supermarket)": return "#FBC02D"; //yellow
+            case "Outdoor Reading Spot": return "#388E3C"; //green
+            case "Indoor Reading Spot": return "#7B1FA2"; //purple
+            case "Converted Bus Shelter": return "#F98CB9"; //pink
+            case "Council-owned Library": return "#03A9F4"; //blue
+            default: return "#1E88E5"; //blue
+        }
+    }
+
 }

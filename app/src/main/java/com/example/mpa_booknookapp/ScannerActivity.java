@@ -51,7 +51,7 @@ public class ScannerActivity extends AppCompatActivity {
             @Override
             public void barcodeResult(BarcodeResult result) {
                 if (result.getText() != null) {
-                    barcodeView.pause(); //stop scanning immediately
+                    barcodeView.pause(); //stop scanning now
 
                     String scannedISBN = result.getText();
 

@@ -66,15 +66,15 @@
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:paddingBottom="8dp">
+                android:paddingBottom="8dp"
+                android:scrollbars="none">
 
                 <LinearLayout
                     android:id="@+id/llPhotoGallery"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cvAddPhoto"
@@ -123,6 +123,7 @@
                 android:layout_marginTop="24dp"
                 android:hint="Nook Name"
                 app:placeholderText="Enter Nook Name here...">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etNookName"
                     android:layout_width="match_parent"
@@ -138,12 +139,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Nook Type">
+
                 <AutoCompleteTextView
                     android:id="@+id/nookType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
-                    android:text="Converted Phonebox" />
+                    android:text="Converted Phone Box" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- big box to write a description in -->
@@ -153,15 +155,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="Nook Description"
-                app:placeholderText="This book nook is..."
-                app:helperText="Tip: Describe the location and the types of books found here.">
+                app:helperText="Tip: Describe the location and the types of books found here."
+                app:placeholderText="This book nook is...">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minLines="4"
-                    android:gravity="top" />
+                    android:gravity="top"
+                    android:minLines="4" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- 24/7 switch required-->
@@ -178,8 +180,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="8dp"
-                android:text="Accessibility and Access"
-                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:text="Features &amp; Accessibility (Select all that apply)"
+                android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.chip.ChipGroup
@@ -195,7 +197,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Wheelchair Accessible"
-                    app:chipIcon="@drawable/ic_wheelchair" />
+                    app:chipIcon="@drawable/ic_wheelchair"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
+
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipWellLit"
@@ -203,7 +208,79 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Well Lit Area"
-                    app:chipIcon="@drawable/ic_lightbulb" />
+                    app:chipIcon="@drawable/ic_lightbulb"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipSeating"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipIcon="@drawable/ic_seating"
+                    android:text="Seating Available"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipToilets"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nearby Toilets"
+                    app:chipIcon="@drawable/ic_toilet"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipParking"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="On-site Parking"
+                    app:chipIcon="@drawable/ic_parking"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTransit"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Near Public Transit"
+                    app:chipIcon="@drawable/ic_bus"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipKidFriendly"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kid-Friendly"
+                    app:chipIcon="@drawable/ic_child"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipDogFriendly"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dog Friendly"
+                    app:chipIcon="@drawable/ic_dog"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipQuietZone"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quiet Zone"
+                    app:chipIcon="@drawable/ic_quiet"
+                    app:chipIconVisible="true"
+                    app:checkedIconVisible="false"/>
             </com.google.android.material.chip.ChipGroup>
 
         </LinearLayout><!--end on details linear layout-->

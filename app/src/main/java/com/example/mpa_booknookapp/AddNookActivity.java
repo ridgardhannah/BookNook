@@ -1,12 +1,18 @@
 package com.example.mpa_booknookapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -36,12 +42,12 @@ import java.util.List;
 import java.util.Map;
 
 public class AddNookActivity extends AppCompatActivity {
-//global variables for methods to use
+    //global variables for methods to use
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private double nookLat, nookLng;
     private TextInputEditText etNookName, etDescription;
     private AutoCompleteTextView typeDropdown;
-    private Chip chipWheelchair, chipWellLit;
+    private Chip chipWheelchair, chipStepFree, chipWellLit, chipSeating, chipToilet, chipParking, chipTransit, chipKidFriendly, chipDogFriendly, chipQuietZone;
     private MaterialButton btnSubmitNook;
     private MaterialSwitch switchOpen247;
 
@@ -68,9 +74,20 @@ public class AddNookActivity extends AppCompatActivity {
         etDescription = findViewById(R.id.etDescription);
         typeDropdown = findViewById(R.id.nookType);
         switchOpen247 = findViewById(R.id.switchOpen247);
+        etNookName = findViewById(R.id.etNookName);
+        etDescription = findViewById(R.id.etDescription);
+        typeDropdown = findViewById(R.id.nookType);
+        switchOpen247 = findViewById(R.id.switchOpen247);
         chipWheelchair = findViewById(R.id.chipWheelchair);
         chipWellLit = findViewById(R.id.chipWellLit);
-        //do more accessibility chips at some point
+        chipSeating = findViewById(R.id.chipSeating);
+        chipToilet = findViewById(R.id.chipToilets);
+        chipParking = findViewById(R.id.chipParking);
+        chipTransit = findViewById(R.id.chipTransit);
+        chipKidFriendly = findViewById(R.id.chipKidFriendly);
+        chipDogFriendly = findViewById(R.id.chipDogFriendly);
+        chipQuietZone = findViewById(R.id.chipQuietZone);
+        btnSubmitNook = findViewById(R.id.btnSubmitNook);
         btnSubmitNook = findViewById(R.id.btnSubmitNook);
 
         findViewById(R.id.toolbarBackBtn).setOnClickListener(v -> finish());
@@ -165,7 +182,7 @@ public class AddNookActivity extends AppCompatActivity {
         int sizeInPx = (int) (100 * getResources().getDisplayMetrics().density);
         int marginInPx = (int) (8 * getResources().getDisplayMetrics().density);
 
-        android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(sizeInPx, sizeInPx);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(sizeInPx, sizeInPx);
         params.setMarginEnd(marginInPx);
         newImage.setLayoutParams(params);
 
@@ -197,19 +214,32 @@ public class AddNookActivity extends AppCompatActivity {
         boolean isOpen247 = switchOpen247.isChecked();
 
         java.util.List<String> selectedAccessibility = new java.util.ArrayList<>();
+
         if (chipWheelchair.isChecked()) selectedAccessibility.add("Wheelchair Accessible");
         if (chipWellLit.isChecked()) selectedAccessibility.add("Well Lit Area");
+        if (chipSeating.isChecked()) selectedAccessibility.add("Seating Available");
+        if (chipToilet.isChecked()) selectedAccessibility.add("Weatherproof");
+        if (chipParking.isChecked()) selectedAccessibility.add("On-site Parking");
+        if (chipTransit.isChecked()) selectedAccessibility.add("Near Public Transit");
+        if (chipKidFriendly.isChecked()) selectedAccessibility.add("Kid-Friendly");
+        if (chipDogFriendly.isChecked()) selectedAccessibility.add("Dog Friendly");
+        if (chipQuietZone.isChecked()) selectedAccessibility.add("Quiet Zone");
 
         //tell user to wait while it uploads
         btnSubmitNook.setText("Saving Nook...");
         btnSubmitNook.setEnabled(false);
 
-        //bypassing Firebase Storage for now. image issues :(
-        //will save all the text to Firestore instead so app can still work
-        saveNookDataToFirestore(name, type, description, isOpen247, selectedAccessibility, "");
+        //put all photo uris into a list of strings
+        List<String> localPhotoPaths = new ArrayList<>();
+        for (Uri uri : photoUris) {
+            localPhotoPaths.add(uri.toString());
+        }
+
+        //send list to firebase
+        saveNookDataToFirestore(name, type, description, isOpen247, selectedAccessibility, localPhotoPaths);
     }
 
-    private void saveNookDataToFirestore(String name, String type, String desc, boolean is247, java.util.List<String> access, String photoUrl) {
+    private void saveNookDataToFirestore(String name, String type, String desc, boolean is247, java.util.List<String> access, List<String> photoUrls) {
         java.util.Map<String, Object> nookData = new java.util.HashMap<>();
         java.util.List<String> activityTimeline = new java.util.ArrayList<>();
         activityTimeline.add("Nothing has happened at this nook yet. Be the first!");
@@ -224,7 +254,7 @@ public class AddNookActivity extends AppCompatActivity {
         nookData.put("colour", getColourForType(type));
         nookData.put("activityLog", activityTimeline);
         nookData.put("createdAt", com.google.firebase.Timestamp.now());
-        nookData.put("imageUrl", photoUrl);
+        nookData.put("imageUrls", photoUrls);
 
         db.collection("nooks").add(nookData)
                 .addOnSuccessListener(documentReference -> {
@@ -249,14 +279,46 @@ public class AddNookActivity extends AppCompatActivity {
             case "Converted Phone Box":
                 return "#D32F2F"; //red
             case "Community Bookcase (Cafe)":
+                return "#FF9800"; //orange
             case "Community Bookcase (Supermarket)":
                 return "#FBC02D"; //yellow
             case "Outdoor Reading Spot":
                 return "#388E3C"; //green
             case "Indoor Reading Spot":
                 return "#7B1FA2"; //purple
+            case "Converted Bus Shelter":
+                return "#F98CB9"; //pink
+            case "Council-owned Library":
+                return "#03A9F4"; //blue
             default:
                 return "#1E88E5"; //blue as default or just in case
         }
     }
+
+    //to hide keyboard when tapping away from it
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            hideKeyboard(event);
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    private void hideKeyboard(MotionEvent event) {
+        View v = getCurrentFocus();
+        if (v instanceof EditText) {
+            Rect outRect = new android.graphics.Rect();
+            v.getGlobalVisibleRect(outRect);
+
+            //if tap is outside a text box to type in
+            if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
+                v.clearFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0); //hide it
+                }
+            }
+        }
+    }
+
 }

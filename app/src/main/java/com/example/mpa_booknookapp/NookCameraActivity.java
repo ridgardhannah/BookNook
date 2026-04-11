@@ -48,7 +48,7 @@ public class NookCameraActivity extends AppCompatActivity {
 
         //from permissions stuff
         //check for if user already gave permission. if not ask for it. if yes crack on
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && //if permission to access camer and permission to write to gallery not granted:
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && //if permission to access camer and permission to write to gallery not granted
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             //ask perission now
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
@@ -62,14 +62,22 @@ public class NookCameraActivity extends AppCompatActivity {
     }
 
 
+
     //ask system for camera manager
     @SuppressLint("RestrictedApi")
     private void startCameraX(ProcessCameraProvider cameraProvider) {
         //get rid of any older camer connections first
         cameraProvider.unbindAll();
-       //pick back camera
+
+        //check intent. does it want front camera?
+        boolean useFrontCamera = getIntent().getBooleanExtra("USE_FRONT_CAMERA", false);
+
+        //based on that pick camera lens. front or rear
+        int lensFacing = useFrontCamera ? CameraSelector.LENS_FACING_FRONT : CameraSelector.LENS_FACING_BACK;
+
+        //pick camera
         CameraSelector cameraSelector = new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .requireLensFacing(lensFacing)
                 .build();
 
         Preview preview = new Preview.Builder().build();

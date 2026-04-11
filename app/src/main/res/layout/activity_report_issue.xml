@@ -8,9 +8,9 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- removed margintop=24 so it sits better-->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarReport"
+        android:layout_marginTop="24dp"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
@@ -35,25 +35,30 @@
 
         <!--checkboxes -->
         <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbDamaged"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Damaged / Vandalised" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbNotExist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nook doesn't exist" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbInappropriate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Inappropriate content" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbOther"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Other" />
+
 
         <!--text for add photo-->
         <TextView
@@ -61,18 +66,54 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Add a photo (optional)"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            />
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
-        <!-- add photo button-->
-        <com.google.android.material.button.MaterialButton
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
+        <HorizontalScrollView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Upload Photo"
-            app:icon="@drawable/ic_add"
-            />
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/llReportPhotoGallery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cvAddReportPhoto"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_camera"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/reportPhotoContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
 
 
         <!--text input for details -->
@@ -87,12 +128,12 @@
 
             <!--removed hardcoded text-->
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etReportDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top"
                 android:inputType="textMultiLine"
-                android:minLines="4"
-                />
+                android:minLines="4" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>

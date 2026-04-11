@@ -17,11 +17,23 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 
 public class ConfirmBookActivity extends AppCompatActivity {
@@ -156,7 +168,6 @@ public class ConfirmBookActivity extends AppCompatActivity {
                     tvTitle.setText("Network error!");
                     Toast.makeText(this, "We were unable to connect to the Books database", Toast.LENGTH_SHORT).show();
 
-                    //bloody bugs
                     //find error code. use logcat to check
                     if (error.networkResponse != null) {
                         Log.e("VOLLEY_ERROR", "HTTP Status Code: " + error.networkResponse.statusCode);
@@ -173,150 +184,228 @@ public class ConfirmBookActivity extends AppCompatActivity {
     private void processBookTransaction() {
         FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
         String userId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
-        com.google.firebase.firestore.DocumentReference userRef = db.collection("users").document(userId);
+        DocumentReference userRef = db.collection("users").document(userId);
 
         String title = tvTitle.getText().toString();
         String author = tvAuthor.getText().toString();
-        String todayDate = new java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(new java.util.Date());
-
-        java.util.Map<String, Object> bookData = new java.util.HashMap<>();
+        String todayDate = new SimpleDateFormat("dd MMM yyyy 'at' HH:mm", Locale.getDefault()).format(new Date());
+        Map<String, Object> bookData = new HashMap<>();
         bookData.put("title", title);
         bookData.put("author", author);
         bookData.put("isbn", scannedISBN);
         bookData.put("coverUrl", currentCoverUrl);
-        bookData.put("addedAt", com.google.firebase.Timestamp.now());
+        bookData.put("addedAt", Timestamp.now());
+
 
         //check for wishlist first before donate/find
         if (scanMode.equals("WISHLIST")) {
 
-            //check db for specific isbn to avoid dupes
-            userRef.collection("wishlist")
-                    .whereEqualTo("isbn", scannedISBN)
-                    .get()
-                    .addOnSuccessListener(querySnapshot -> {
+            //hunt for the isbn for this book and user. to check for dupes
+            userRef.collection("wishlist").whereEqualTo("isbn", scannedISBN).get().addOnSuccessListener(querySnapshot -> {
+                if (!querySnapshot.isEmpty()) {
+                    //found repeat. dont add to wishlist
+                    Toast.makeText(this, "This book is already in your Wishlist!", Toast.LENGTH_LONG).show();
+                    finish(); //kill screen
+                } else {
+                    //add to wishlist as new book document
+                    userRef.collection("wishlist").add(bookData).addOnSuccessListener(docRef -> {
 
-                        if (!querySnapshot.isEmpty()) {
-                            //match was found so dont save it. tell user already in wishlist
-                            android.widget.Toast.makeText(this, "This book is already in your Wishlist!", android.widget.Toast.LENGTH_LONG).show();
-                            finish(); //back to wishliost screen
-
-                        } else {
-                            //no match found. can add to wishlist
-                            userRef.collection("wishlist").add(bookData)
-                                    .addOnSuccessListener(docRef -> {
-                                        finishWithSuccess("'" + title + "' added to your Wishlist!");
-                                    })
-                                    .addOnFailureListener(e -> android.widget.Toast.makeText(this, "Failed to add to Wishlist: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show());
-                        }
-                    })
-                    .addOnFailureListener(e -> android.widget.Toast.makeText(this, "Error checking Wishlist: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show());
+                        //wait for the increment to finish then check for achievements
+                        userRef.update("wishlistAddedCount", com.google.firebase.firestore.FieldValue.increment(1))
+                                .addOnSuccessListener(aVoid -> {
+                                    checkForAchievements(userRef, "'" + title + "' added to your Wishlist!");
+                                });
+                    });
+                }
+            });
+            return; //end of wishlist mode leave method now
 
         } else {
+            //only look up the  nook if donating or finding
+            //go into nooks and find the one with the matching nookid
+            DocumentReference nookRef = db.collection("nooks").document(currentNookId);
+            //within that nook, get the inventory of books in there
+            CollectionReference inventoryRef = nookRef.collection("inventory");
 
-            //only look up nook if donating or finding
-            com.google.firebase.firestore.DocumentReference nookRef = db.collection("nooks").document(currentNookId);
-            com.google.firebase.firestore.CollectionReference inventoryRef = nookRef.collection("inventory");
+            //get user data now
+            userRef.get().addOnSuccessListener(userDoc -> {
 
-            if (scanMode.equals("DONATE")) {
-                inventoryRef.add(bookData).addOnSuccessListener(docRef -> {
-                    nookRef.update("activityLog", com.google.firebase.firestore.FieldValue.arrayUnion("A copy of '" + title + "' was donated!" + " • " + todayDate));
+                //is it a new nook?
+                List<String> visitedNooks = (List<String>) userDoc.get("visitedNookIds");
+                if (visitedNooks == null) visitedNooks = new ArrayList<>();
+                boolean isNewNook = !visitedNooks.contains(currentNookId);
 
-                    userRef.update("donatedCount", com.google.firebase.firestore.FieldValue.increment(1))
-                            .addOnSuccessListener(aVoid -> checkForAchievements(userRef, "Thanks for donating!"));
+                //put all user updates into one big update box to deal with at once
+                Map<String, Object> userUpdates = new HashMap<>();
+                List<String> newLogs = new ArrayList<>(); //hold logs
 
-                }).addOnFailureListener(e -> Toast.makeText(this, "Failed to donate: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                //shove updates in box ready to roll
+                if (scanMode.equals("DONATE")) {
+                    userUpdates.put("donatedCount", com.google.firebase.firestore.FieldValue.increment(1));
+                    newLogs.add("You donated '" + title + "'! • " + todayDate);
+                } else if (scanMode.equals("FIND")) {
+                    userUpdates.put("foundCount", com.google.firebase.firestore.FieldValue.increment(1));
+                    newLogs.add("You found '" + title + "'! • " + todayDate);
+                }
 
-            } else if (scanMode.equals("FIND")) {
-                inventoryRef.whereEqualTo("isbn", scannedISBN).limit(1).get()
-                        .addOnSuccessListener(inventoryQuery -> {
+                if (isNewNook) {
+                    userUpdates.put("visitedNookIds", com.google.firebase.firestore.FieldValue.arrayUnion(currentNookId));
+                    userUpdates.put("nooksCount", com.google.firebase.firestore.FieldValue.increment(1));
+                    newLogs.add("You explored a new Nook! • " + todayDate);
+                }
+
+                //put all the logs into the box at the same time
+                if (!newLogs.isEmpty()) {
+                    userUpdates.put("recentActivity", com.google.firebase.firestore.FieldValue.arrayUnion(newLogs.toArray()));
+                }
+
+
+                //now actually make the updates happen, depending on if its donate or fied
+                if (scanMode.equals("DONATE")) {
+                    inventoryRef.add(bookData).addOnSuccessListener(docRef -> {
+                        nookRef.update("activityLog", FieldValue.arrayUnion("A copy of '" + title + "' was donated! • " + todayDate));
+
+                        //send update box to db
+                        userRef.update(userUpdates).addOnSuccessListener(aVoid -> {
+                            checkForAchievements(userRef, "Thanks for donating!");
+                        });
+                    }).addOnFailureListener(e -> Toast.makeText(this, "Failed to donate", Toast.LENGTH_SHORT).show());
+
+                } else if (scanMode.equals("FIND")) {
+
+                    //look at wishlist
+                    //before the find action is done, check if it was on the wishlist
+                    userRef.collection("wishlist").whereEqualTo("isbn", scannedISBN).get().addOnSuccessListener(wishlistQuery -> {
+                        if (!wishlistQuery.isEmpty()) {
+                            //found a match
+                            String wishlistDocId = wishlistQuery.getDocuments().get(0).getId();
+
+                            //delete it from wishlist
+                            userRef.collection("wishlist").document(wishlistDocId).delete();
+
+                            //add the lifetime wishlist counter to the update box
+                            userUpdates.put("wishlistFoundCount", FieldValue.increment(1));
+
+                            //add a log to the activity feed
+                            userUpdates.put("recentActivity", FieldValue.arrayUnion("Wish granted! You found '" + title + "'! • " + todayDate));
+                        }
+
+                        //continue find logic
+                        inventoryRef.whereEqualTo("isbn", scannedISBN).limit(1).get().addOnSuccessListener(inventoryQuery -> {
                             if (!inventoryQuery.isEmpty()) {
                                 String bookId = inventoryQuery.getDocuments().get(0).getId();
                                 inventoryRef.document(bookId).delete();
-                                nookRef.update("activityLog", com.google.firebase.firestore.FieldValue.arrayUnion("'" + title + "' was taken to a new home!"));
-
-                                userRef.update("foundCount", com.google.firebase.firestore.FieldValue.increment(1))
-                                        .addOnSuccessListener(aVoid -> checkForAchievements(userRef, "Thanks for finding a book!"));
-
+                                nookRef.update("activityLog", FieldValue.arrayUnion("'" + title + "' was taken to a new home! • " + todayDate));
                             } else {
-                                nookRef.update("activityLog", com.google.firebase.firestore.FieldValue.arrayUnion("A hidden gem ('" + title + "') was discovered and taken!"));
-
-                                userRef.update("foundCount", com.google.firebase.firestore.FieldValue.increment(1))
-                                        .addOnSuccessListener(aVoid -> checkForAchievements(userRef, "Thanks for finding a book!"));
+                                nookRef.update("activityLog", FieldValue.arrayUnion("A hidden gem ('" + title + "') was discovered! • " + todayDate));
                             }
-                        }).addOnFailureListener(e -> Toast.makeText(this, "Failed to find book: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-            }
+
+                            //send update box to db (now carrying wishlist updates if there were any!)
+                            userRef.update(userUpdates).addOnSuccessListener(aVoid -> {
+                                checkForAchievements(userRef, "Thanks for finding a book!");
+                            });
+                        });
+                    });
+                }
+            });
         }
     }
+        private void finishWithSuccess (String message){
+            //show success mesage
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            //go back to main map. clear the scanner history
+            //close the confirmation screen. user will go back to nook details page
+            finish();
+        }
 
-    private void finishWithSuccess(String message) {
-        //show success mesage
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        //go back to main map. clear the scanner history
-        //close the confirmation screen. user will go back to nook details page
-        finish();
-    }
+
 
 
     private void checkForAchievements(com.google.firebase.firestore.DocumentReference userRef, String successMessage) {
+        //asynchronous data retrievel bit
+        //ask firestore for the latest user data after the increment is successful
         userRef.get().addOnSuccessListener(documentSnapshot -> {
+            //check user document exists first
             if (documentSnapshot.exists()) {
+
+
+                //pull data from the document
+                //use ternary operators as a safety net. default to 0 if it doesnt exist yet
                 long donated = documentSnapshot.getLong("donatedCount") != null ? documentSnapshot.getLong("donatedCount") : 0;
                 long found = documentSnapshot.getLong("foundCount") != null ? documentSnapshot.getLong("foundCount") : 0;
+                long nooks = documentSnapshot.getLong("nooksCount") != null ? documentSnapshot.getLong("nooksCount") : 0;
+                long wishlistAdded = documentSnapshot.getLong("wishlistAddedCount") != null ? documentSnapshot.getLong("wishlistAddedCount") : 0;
+                long wishlistFound = documentSnapshot.getLong("wishlistFoundCount") != null ? documentSnapshot.getLong("wishlistFoundCount") : 0;
 
-                boolean achievementUnlocked = false;
+                //check finding achievement thresholds
+                if (scanMode.equals("FIND")) {
+                    if (found == 5) { showAchievementDialog("Reader", "You found 5 books!"); return; }
+                    if (found == 10) { showAchievementDialog("Bookworm", "You found 10 books!"); return; }
+                    if (found == 30) { showAchievementDialog("Archivist", "You found 30 books!"); return; }
+                    if (found == 60) { showAchievementDialog("Book Keeper", "You found 60 books!"); return; }
 
-                if (scanMode.equals("DONATE")) {
-                    if (donated == 1) {
-                        showAchievementDialog("A Novel Beginning!", "You've donated your very first book to a Nook!");
-                        achievementUnlocked = true;
-                    } else if (donated == 5) {
-                        showAchievementDialog("Famous Five!", "You have donated 5 books!");
-                        achievementUnlocked = true;
-                    }
-                } else if (scanMode.equals("FIND")) {
-                    if (found == 1) {
-                        showAchievementDialog("An Unexpected Journey!", "You found your very first book in a Nook! Enjoy it!");
-                        achievementUnlocked = true;
-                    } else if (found == 10) {
-                        showAchievementDialog("Bookworm!", "10 books found! You are building a great collection!");
-                        achievementUnlocked = true;
-                    }
+                    if (wishlistFound == 1) { showAchievementDialog("Serendipity", "You found your very first Wishlist book!"); return; }
+                    if (wishlistFound == 5) { showAchievementDialog("Prophecy", "You found 5 Wishlist books!"); return; }
                 }
 
-                //if here then they didnt get an achievement. close screen normally
-                if (!achievementUnlocked) {
-                    finishWithSuccess(successMessage);
+                    //check donating achievement thresholds
+                  if (scanMode.equals("DONATE")) {
+                    if (donated == 5) { showAchievementDialog("Giver", "You donated 5 books!"); return; }
+                    if (donated == 10) { showAchievementDialog("Benefactor", "You donated 10 books!"); return; }
+                    if (donated == 20) { showAchievementDialog("Patron", "You donated 20 books!"); return; }
                 }
+
+                //check wishlist adding achievement thresholds
+                if (scanMode.equals("WISHLIST")) {
+                    if (wishlistAdded == 1) { showAchievementDialog("Dreamer", "You added your first book to your Wishlist!"); return; }
+                    if (wishlistAdded == 10) { showAchievementDialog("Magpie", "You added 10 books to your Wishlist!"); return; }
+                    if (wishlistAdded == 20) { showAchievementDialog("Curator", "You added 20 books to your Wishlist!"); return; }
+                }
+
+                //check exploring new nooks threshold - donating or finding
+                if (scanMode.equals("DONATE") || scanMode.equals("FIND")) {
+                    if (nooks == 5) { showAchievementDialog("Scout", "You explored 5 unique Nooks!"); return; }
+                    if (nooks == 10) { showAchievementDialog("Explorer", "You explored 10 unique Nooks!"); return; }
+                    if (nooks == 20) { showAchievementDialog("Pathfinder", "You explored 20 unique Nooks!"); return; }
+                }
+                //if we get to here its just standard completion. no new thresholds crossed
+                //dismiss loading screen. show success
+                finishWithSuccess(successMessage);
             }
+        }).addOnFailureListener(e -> {
+            //problem escape
+            //if user has internet issue or firebase freaks out this catches the error
+            //stops being stuck on the logging transaction bit
+            finishWithSuccess(successMessage);
         });
     }
 
 
-    private void showAchievementDialog(String title, String description) {
-        //builder for the popup
-        com.google.android.material.dialog.MaterialAlertDialogBuilder builder =
-                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this);
+        private void showAchievementDialog (String title, String description){
+            //builder for the popup
+            com.google.android.material.dialog.MaterialAlertDialogBuilder builder =
+                    new com.google.android.material.dialog.MaterialAlertDialogBuilder(this);
 
-        //set the text
-        builder.setTitle("🏆 Achievement Unlocked!");
-        builder.setMessage(title + "\n\n" + description);
+            //set the text
+            builder.setTitle("🏆 Achievement Unlocked!");
+            builder.setMessage(title + "\n\n" + description);
 
-        builder.setPositiveButton("View in Profile", (dialog, which) -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("GO_TO_PROFILE", true);
-            intent.putExtra("OPEN_ACHIEVEMENTS", true); //pass the intent extras
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        });
+            builder.setPositiveButton("View in Profile", (dialog, which) -> {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("GO_TO_PROFILE", true);
+                intent.putExtra("OPEN_ACHIEVEMENTS", true); //pass the intent extras
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                finish();
+            });
 
-        //button to close/stay here
-        builder.setNegativeButton("Okay", (dialog, which) -> {
-            dialog.dismiss();
-            finish(); //back to nook details
-        });
+            //button to close/stay here
+            builder.setNegativeButton("Okay", (dialog, which) -> {
+                dialog.dismiss();
+                finish(); //back to nook details
+            });
 
-        //show it
-        builder.show();
+            //show it
+            builder.show();
+        }
     }
-}

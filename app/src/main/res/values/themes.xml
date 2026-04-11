@@ -1,36 +1,36 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- basee application theme. -->
     <style name="Theme.BookNookApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- PRIMARY (based on Logo sage green, and olive green) -->
-        <!-- for Filled Buttons, App Bar Text, Active States -->
+        <!--primary. based on logo sage green, and olive green-->
+        <!--for filled buttons, app bar text, active states-->
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
-        <!-- for Active Tab Backgrounds and llight highlights -->
+        <!-- for active tab backgrounds and llight highlights-->
         <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_onPrimaryContainer
         </item> <!-- darker green will be text colour on sage green -->
 
-        <!-- SECONDARY based on a slate grey-->
+        <!-- secondary. based on a slate grey-->
         <!-- for bottom nav bar icons and filter chips -->
         <item name="colorSecondary">@color/md_theme_secondary</item>
         <item name="colorOnSecondary">@color/md_theme_onSecondary</item>
         <item name="colorSecondaryContainer">@color/md_theme_secondaryContainer</item>
         <item name="colorOnSecondaryContainer">@color/md_theme_onSecondaryContainer</item>
 
-        <!-- TERTIARY (rusty orange colour for contrast) -->
-        <!-- for the "Add Nook" FAB and ntification badges -->
+        <!-- tertiary. rusty orange colour for contrast-->
+        <!-- for the Add Nook FAB and ntification badges -->
         <item name="colorTertiary">@color/md_theme_tertiary</item>
         <item name="colorOnTertiary">@color/md_theme_onTertiary</item>
         <item name="colorTertiaryContainer">@color/md_theme_tertiaryContainer
-        </item> <!-- light peachy colour to be paler rust orange -->
+        </item> <!--light peachy colour to be paler rust orange-->
         <item name="colorOnTertiaryContainer">@color/md_theme_onTertiaryContainer</item>
 
-        <!-- BACKGROUNDS (cream /off white like book pages -->
-        <item name="colorSurface">@color/md_theme_surface</item> <!-- cream like pages-->
+        <!-- backgrounds (cream /off white like book pages -->
+        <item name="colorSurface">@color/md_theme_surface</item> <!-- cream like book pages-->
         <item name="colorOnSurface">@color/md_theme_onSurface
-        </item> <!-- slightly off black for text on cream -->
+        </item> <!--slightly off black for text on cream-->
         <item name="colorSurfaceContainer">@color/md_theme_surfaceContainer
-        </item> <!-- slightly lighter cream-->
+        </item> <!--slightly lighter cream-->
 
         <!--variant colours-->
         <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
@@ -38,11 +38,11 @@
 
 
 
-        <!-- ERROR (material 3 red for errors. need for accessibility) -->
+        <!-- error (material 3 red for errors. need for accessibility) -->
         <item name="colorError">@color/md_theme_error</item>
         <item name="colorOnError">@color/md_theme_onError</item>
 
-        <!-- easier named colours to use often -->
+        <!--easier named colours to use often-->
         <item name="android:windowBackground">@color/md_theme_surface</item>
         <item name="android:statusBarColor">@color/md_theme_surface</item>
         <item name="android:windowLightStatusBar">true</item>
@@ -58,6 +58,14 @@
 
     <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_book_nook</item>
+
+        <item name="windowSplashScreenBackground">#27201C</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.BookNookApp</item>
     </style>
 
 </resources>

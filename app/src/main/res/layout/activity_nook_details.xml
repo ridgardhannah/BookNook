@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -21,8 +22,7 @@
             android:layout_marginEnd="16dp"
             android:contentDescription="Book Nook Logo"
             android:padding="4dp"
-            android:src="@drawable/logo_book_nook"
-            />
+            android:src="@drawable/logo_book_nook" />
 
     </com.google.android.material.appbar.MaterialToolbar>
 
@@ -43,8 +43,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img_map_placeholder"
-                />
+                android:src="@drawable/img_map_placeholder" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/llNookGallery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -83,8 +97,7 @@
                         android:layout_weight="1"
                         android:text="Donate"
                         app:icon="@drawable/ic_add"
-                        app:iconGravity="textStart"
-                        />
+                        app:iconGravity="textStart" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnFind"
@@ -95,8 +108,7 @@
                         android:layout_weight="1"
                         android:text="Find Book"
                         app:icon="@drawable/ic_search"
-                        app:iconGravity="textStart"
-                        />
+                        app:iconGravity="textStart" />
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
@@ -106,8 +118,7 @@
                     android:layout_height="wrap_content"
                     android:text="Get Directions"
                     app:icon="@drawable/ic_map"
-                    app:iconGravity="textStart"
-                    />
+                    app:iconGravity="textStart" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -122,22 +133,26 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Loading description..."
-                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
                 <TextView
+                    android:id="@+id/tvFeaturesLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Accessibility"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+                    android:layout_marginTop="16dp"
+                    android:text="Nook Features"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                    android:textColor="?attr/colorPrimary"
+                    android:visibility="gone" />
 
                 <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/cgAccessibility"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
-                </com.google.android.material.chip.ChipGroup>
+                android:id="@+id/chipGroupDetailsAccessibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="4dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -160,7 +175,6 @@
                     android:text="Loading books..."
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textStyle="italic" />
-
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -189,10 +203,12 @@
                     android:text="Report Issue"
                     android:textColor="?attr/colorPrimary"
                     app:icon="@drawable/ic_report"
-                    app:iconTint="?attr/colorPrimary"
                     app:iconGravity="textStart"
+                    app:iconTint="?attr/colorPrimary"
                     app:strokeColor="?attr/colorPrimary" />
 
-            </LinearLayout></LinearLayout></androidx.core.widget.NestedScrollView>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

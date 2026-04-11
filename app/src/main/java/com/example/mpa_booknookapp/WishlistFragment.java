@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -28,6 +29,10 @@ public class WishlistFragment extends Fragment {
     private RecyclerView listView;
     private BookAdapter adapter;
     private ArrayList<BookModel> bookList;
+
+    //for when no books are in wishlist
+    private View emptyStateLayout;
+
 
     public WishlistFragment() {
         //empty public constructor
@@ -41,6 +46,7 @@ public class WishlistFragment extends Fragment {
         bookList = new ArrayList<>();
         listView = view.findViewById(R.id.lvWishlist);
         listView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        emptyStateLayout = view.findViewById(R.id.layoutEmptyState);
 
         adapter = new BookAdapter(bookList);
         listView.setAdapter(adapter);
@@ -64,7 +70,7 @@ public class WishlistFragment extends Fragment {
                         .collection("users").document(userId)
                         .collection("wishlist").document(swipedBook.getDocumentId())
                         .delete()
-                        .addOnSuccessListener(aVoid -> { //it worked
+                        .addOnSuccessListener(aVoid -> { //it worked yay
                             Toast.makeText(getContext(), swipedBook.getTitle() + " removed!", Toast.LENGTH_SHORT).show();
                         })
                         .addOnFailureListener(e -> { //it didnt work
@@ -80,6 +86,15 @@ public class WishlistFragment extends Fragment {
 
         //get data from firebase
         loadWishlistFromFirebase();
+
+        //open settigns when user taps gear icon
+        ImageView btnSettings = view.findViewById(R.id.btnSettings);
+        if (btnSettings != null) {
+            btnSettings.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+            });
+        }
 
         //open scanner for wishlist
         view.findViewById(R.id.btnScanWishlist).setOnClickListener(v -> {
@@ -117,7 +132,7 @@ public class WishlistFragment extends Fragment {
         //listen towishlist in real time
         db.collection("users").document(userId).collection("wishlist")
                 //newest to oldest
-                .orderBy("addedAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .orderBy("addedAt", Query.Direction.DESCENDING)
                 //to pull refreshed list when needed
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -150,6 +165,13 @@ public class WishlistFragment extends Fragment {
 
                         //tell adapter data has changed so it refreshes the screen
                         adapter.notifyDataSetChanged();
+                        if (bookList.isEmpty()) {
+                            listView.setVisibility(View.GONE);
+                            emptyStateLayout.setVisibility(View.VISIBLE);
+                        } else {
+                            listView.setVisibility(View.VISIBLE);
+                            emptyStateLayout.setVisibility(View.GONE);
+                        }
                     }
                 });
     }
@@ -169,4 +191,6 @@ public class WishlistFragment extends Fragment {
         android.widget.EditText etSearch = getView().findViewById(R.id.etWishlistSearch);
         if (etSearch != null) etSearch.setText("");
     }
+
+
 }
