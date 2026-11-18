@@ -5,13 +5,13 @@
   Built with Material Design 3, Firebase, CameraX, and the Google Books API.
 </p>
 
-<p align="center">
+
 ![Android](https://img.shields.io/badge/Platform-Android-3DDC84?style=flat-square)
 ![Java](https://img.shields.io/badge/Language-Java-ED8B00?style=flat-square)
 ![Firebase](https://img.shields.io/badge/Backend-Firebase-FFCA28?style=flat-square)
 ![Material Design 3](https://img.shields.io/badge/Design-Material_Design_3-757575?style=flat-square)
 ![Google APIs](https://img.shields.io/badge/APIs-Google_Books_%26_Maps-4285F4?style=flat-square)
-</p>
+
 ---
 
 ## Overview
